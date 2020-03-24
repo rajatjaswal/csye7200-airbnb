@@ -1,0 +1,16 @@
+target/
+*.class
+.classpath
+.project
+.settings/
+node_modules/
+out/
+.DS_Store
+.ensime_cache
+*.vsix
+*.log
+scala/server/ensimeServer-assembly*
+coursier
+.ensime
+.hydra
+.idea
