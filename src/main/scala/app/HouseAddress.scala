@@ -16,7 +16,7 @@ object HouseAddress {
     val price=Try(ws(4).toLong).getOrElse(0L)
     val landSize=Try(ws(13).toLong).getOrElse(0L)
     val coordinates = Coordinates.parse(elements(ws, 17, 18))
-    val isHotel: Boolean = false
+    val isHotel: Boolean = rooms >=5
     val availability: Boolean = true
     val decision = Decision.parse("F")
 
