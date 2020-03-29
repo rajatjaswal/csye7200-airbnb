@@ -3,6 +3,7 @@ package app
 import app.HouseAddress.IngestibleHouseAddress
 import app.Listing.IngestibleListing
 import ingestion.Ingest
+import spark.SparkConnector
 
 import scala.io.{Codec, Source}
 import scala.util.Try
@@ -24,4 +25,5 @@ object Main extends App{
     address_source.close()
     listing_source.close()
   }
+  SparkConnector.createNewSparkServer()
 }
