@@ -69,6 +69,9 @@ object Function {
   def invert4[T1, T2, T3, T4, R](f: T1 => T2 => T3 => T4 => R): T4 => T3 => T2 => T1 => R =
     t1 => t2 => t3 => t4 => f(t4)(t3)(t2)(t1)
 
+  def uncurried[T1, T2, R](f: T1 => T2 => R): (T1) => T2 => R =
+    (t1) => t2 => f(t1)(t2)
+
   def uncurried2[T1, T2, T3, R](f: T1 => T2 => T3 => R): (T1, T2) => T3 => R =
     (t1, t2) => t3 => f(t1)(t2)(t3)
 
