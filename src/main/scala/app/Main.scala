@@ -4,13 +4,12 @@ import app.HouseAddress.IngestibleHouseAddress
 import app.Listing.IngestibleListing
 import app.PopularArea.IngestiblePopularArea
 import ingestion.Ingest
-
+import spark.SparkConnector
 import scala.io.{Codec, Source}
 import scala.util.Try
 import Helper.injectIsWithinPopular
 
 object Main extends App{
-
   implicit object IngestibleHouseAddress extends IngestibleHouseAddress
   implicit object IngestibleListing extends IngestibleListing
   implicit object IngestiblePopularArea extends IngestiblePopularArea
@@ -27,13 +26,15 @@ object Main extends App{
     val popularAreas:Seq[Try[PopularArea]] = popularArea_ingestor(popularArea_source).toSeq
     val listingsInjected:Seq[Try[Listing]] = injectIsWithinPopular(popularAreas, listings)
 //    println(addresses);
-    val xs=listingsInjected.filter(l => l.get.isWithinPopular)
+    val xs=listingsInjected.filter(l => if(l.get.isWithinPopular==1)true else false)
     println(listings.length)
     println(xs.length)
 //    println(listingsInjected.toList)
     println(popularAreas)
     address_source.close()
     listing_source.close()
+    popularArea_source.close()
+
+    SparkConnector.createNewSparkServer(listingsInjected)
   }
-//  SparkConnector.createNewSparkServer()
 }
