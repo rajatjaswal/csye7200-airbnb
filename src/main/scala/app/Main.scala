@@ -26,7 +26,7 @@ object Main extends App{
     val popularAreas:Seq[Try[PopularArea]] = popularArea_ingestor(popularArea_source).toSeq
     val listingsInjected:Seq[Try[Listing]] = injectIsWithinPopular(popularAreas, listings)
 //    println(addresses);
-    val xs=listingsInjected.filter(l => if(l.get.isWithinPopular==1)true else false)
+    val xs=listingsInjected.filter(l => l.get.isWithinPopular==1)
     println(listings.length)
     println(xs.length)
 //    println(listingsInjected.toList)

@@ -39,7 +39,7 @@ case class Listing(address: ListingAddress, latitude: Double, longitude: Double,
     val closestPopularAreas = popularAreas.map{
       case Success(pop) => {
         val isWithin = isWithinMileOfArea(mile, pop);
-        (pop, if(isWithin._1)1 else 0, isWithin._2)
+        (pop, if(isWithin._1) 1 else 0, isWithin._2)
       }
     }.filter(_._2==1)
 
