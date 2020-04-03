@@ -8,18 +8,13 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark._
 import org.apache.spark.sql.{SQLContext, SparkSession}
-import app.Listing
-import spark.TrainModel
-import breeze.linalg.max
-import org.apache.spark.ml.classification.{BinaryLogisticRegressionSummary, LogisticRegression}
-import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
-import org.apache.spark.ml.feature.{StringIndexer, VectorAssembler}
+import app.{HouseAddress, Listing}
 
 import scala.util.Try
 
 object SparkConnector {
 
-  def createNewSparkServer(listings: Seq[Try[Listing]]): Unit = {
+  def createNewSparkServer(listings: Seq[Try[Listing]]) = {
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> "localhost:9092",
@@ -31,24 +26,28 @@ object SparkConnector {
     )
 
     val conf = new SparkConf().setAppName("AirbnbProfitPotentials").setMaster("local[2]")
-    //val ssc = new StreamingContext(conf, Seconds(5))
     val sc = new SparkContext(conf)
+    val ssc = new StreamingContext(sc, Seconds(5))
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
     val model = TrainModel.trainModel(rdd, sqlContext)
     model.write.overwrite().save("trained-model")
-//    val topics = Array("airbnb")
-//
-//    val kafkaStream = KafkaUtils.createDirectStream[String, String](
-//      ssc,
-//      PreferConsistent,
-//      Subscribe[String, String](topics, kafkaParams)
-//    )
-//
-//    kafkaStream.map(record=>(record.value().toString)).print
-//    ssc.start()
-//    ssc.awaitTermination()
+    val topics = Array("airbnb")
 
+    val kafkaStream = KafkaUtils.createDirectStream[String, String](
+      ssc,
+      PreferConsistent,
+      Subscribe[String, String](topics, kafkaParams)
+    )
+
+    val newAddresses = kafkaStream.map(record=>{
+      HouseAddress.parse(record.value().toString.split(",").toSeq)
+    }).flatMap(_.toOption)
+
+    newAddresses.print()
+
+    ssc.start()
+    ssc.awaitTermination()
   }
 }
