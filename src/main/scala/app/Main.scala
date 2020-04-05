@@ -37,7 +37,7 @@ object Main extends App{
     popularArea_source.close()
 
     SparkConnector.createNewSparkServer(listingsInjected)
-    WebServer.initialize(addresses);
+    WebServer.initialize(addresses, listingsInjected, popularAreas);
 
     address_source.close()
   }

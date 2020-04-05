@@ -1,7 +1,7 @@
 
 
 function loadMap(){
-    var mymap = L.map('mapid').setView([-37.8136, 144.9631], 13);
+    var mymap = L.map('mapid').setView([-37.8136, 144.9631], 10);
 
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
         maxZoom: 18,
@@ -12,9 +12,6 @@ function loadMap(){
         tileSize: 512,
         zoomOffset: -1
     }).addTo(mymap);
-
-    L.marker([-37.8136, 144.9631]).addTo(mymap)
-        .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
 
     L.circle([-37.8136, 144.9631], 10, {
         color: 'red',
@@ -34,11 +31,13 @@ function loadMap(){
     mymap.on('click', onMapClick);
 
 
-    displayAddresses(L, mymap);
+    // displayAddresses(L, mymap);
+    displayListings(L, mymap);
+    displayPopularArea(L, mymap);
 }
 
 async function displayAddresses(L, mymap){
-    const data = await getAllData();
+    const data = await getData("addresses");
 
     for (let elem in data) {
         const lat = data[elem].lat;
@@ -52,12 +51,51 @@ async function displayAddresses(L, mymap){
     }
 }
 
+async function displayListings(L, mymap){
+    const data = await getData("listings");
+
+    for (let elem in data) {
+        const lat = data[elem].lat;
+        const long = data[elem].long;
+        const decision = data[elem].decision;
+        const options = {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.2
+        };
+        if(decision==0){
+            options.color="blue"
+            options.fillColor="#3197ff"
+        }
+        L.circle([lat, long], 10, options).addTo(mymap)
+    }
+}
+
+async function displayPopularArea(L, mymap){
+    const data = await getData("popularArea");
+
+    for (let elem in data) {
+        const lat = data[elem].lat;
+        const long = data[elem].long;
+        const address = data[elem].address;
+        const options = {
+            color: 'red',
+            fillColor: '#38ff19',
+            fillOpacity: 0.7
+        };
+        L.circle([lat, long], 200, options).addTo(mymap)
+
+        L.marker([lat, long]).addTo(mymap)
+            .bindPopup(address).openPopup();
+    }
+}
+
 loadMap();
 
-async function getAllData() {
+async function getData(type) {
 
     var backendHost = "http://localhost:3700";
-    var backendRoute = `${backendHost}/getAllAddresses`;
+    var backendRoute = `${backendHost}/airbnb-service/${type}`;
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'OPTIONS, POST, GET',
