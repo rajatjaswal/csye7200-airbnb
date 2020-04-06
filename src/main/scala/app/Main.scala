@@ -5,9 +5,11 @@ import app.Listing.IngestibleListing
 import app.PopularArea.IngestiblePopularArea
 import ingestion.Ingest
 import spark.SparkConnector
+
 import scala.io.{Codec, Source}
 import scala.util.Try
 import Helper.injectIsWithinPopular
+import backend.WebServer
 
 object Main extends App{
   implicit object IngestibleHouseAddress extends IngestibleHouseAddress
@@ -31,10 +33,12 @@ object Main extends App{
     println(xs.length)
 //    println(listingsInjected.toList)
     println(popularAreas)
-    address_source.close()
     listing_source.close()
     popularArea_source.close()
 
+    WebServer.initialize(addresses, listingsInjected, popularAreas);
     SparkConnector.createNewSparkServer(listingsInjected)
+
+    address_source.close()
   }
 }
