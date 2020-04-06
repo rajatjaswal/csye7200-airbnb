@@ -21,7 +21,7 @@ object TrainModel {
 
     val splitSeed = 3093
     val Array(trainingData, testData) = df3.randomSplit(Array(0.7, 0.3), splitSeed)
-    val lr = new LogisticRegression().setMaxIter(270).setRegParam(0.01).setElasticNetParam(0.98)
+    val lr = new LogisticRegression().setMaxIter(300).setRegParam(0.01).setElasticNetParam(0.92)
     val model = lr.fit(trainingData)
     val predictions = model.transform(testData)
     predictions.show(30)

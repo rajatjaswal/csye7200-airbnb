@@ -44,9 +44,9 @@ async function displayAddresses(L, mymap){
         const long = data[elem].long;
 
         L.circle([lat, long], 10, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.2
+            color: '#0eff84',
+            fillColor: '#0eff84',
+            fillOpacity: 0.05
         }).addTo(mymap)
     }
 }
