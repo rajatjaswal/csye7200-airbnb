@@ -58,7 +58,7 @@ class ListingSpec extends FlatSpec with Matchers{
     val listing = HelperSpec.listing.copy(latitude = lat1, longitude = lat2)
     val tuple = listing.hasClosestPopularArea(1, listing, HelperSpec.getPopularAreas())
     tuple should matchPattern {
-      case (Nil,0, _) =>
+      case (null,0, _) =>
     }
   }
 }
