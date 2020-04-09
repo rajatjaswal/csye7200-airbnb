@@ -50,4 +50,15 @@ class ListingSpec extends FlatSpec with Matchers{
     }
     assert(tuple._1.place == "Area1")
   }
+
+  it should """return null as closestPopularArea if there is none closest PopularArea within 1 mile """  in
+  {
+    val lat1 = -38.900
+    val lat2 = 156.990
+    val listing = HelperSpec.listing.copy(latitude = lat1, longitude = lat2)
+    val tuple = listing.hasClosestPopularArea(1, listing, HelperSpec.getPopularAreas())
+    tuple should matchPattern {
+      case (Nil,0, _) =>
+    }
+  }
 }
