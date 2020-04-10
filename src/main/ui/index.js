@@ -40,7 +40,7 @@ function loadMap(){
 async function displayAddresses(L, mymap){
     const data = {};
     const addressSocket = new WebSocket(
-        'ws://localhost:3700/airbnb-service/addresses'
+        'ws://localhost:3800/airbnb-service/addresses'
     );
     addressSocket.onmessage = (event) => {
         let data = JSON.parse(event.data);
