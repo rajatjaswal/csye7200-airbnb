@@ -7,7 +7,7 @@ import ingestion.Ingest
 import spark.SparkConnector
 
 import scala.io.{Codec, Source}
-import scala.util.Try
+import scala.util.{Failure, Try}
 import Helper.injectIsWithinPopular
 import backend.WebServer
 
@@ -29,6 +29,8 @@ object Main extends App{
     val listingsInjected:Seq[Try[Listing]] = injectIsWithinPopular(popularAreas, listings)
 //    println(addresses);
     val xs=listingsInjected.filter(l => l.get.isWithinPopular==1)
+    val cleansed_addresses = addresses.filter(a => a.get.coordinates!=Coordinates(0.0,0.0))
+    println(cleansed_addresses);
     println(listings.length)
     println(xs.length)
 //    println(listingsInjected.toList)
@@ -36,7 +38,7 @@ object Main extends App{
     listing_source.close()
     popularArea_source.close()
 
-    WebServer.initialize(addresses, listingsInjected, popularAreas);
+    WebServer.initialize(cleansed_addresses, listingsInjected, popularAreas);
     SparkConnector.createNewSparkServer(listingsInjected)
 
     address_source.close()

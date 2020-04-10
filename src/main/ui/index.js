@@ -31,24 +31,29 @@ function loadMap(){
     mymap.on('click', onMapClick);
 
 
-    // displayAddresses(L, mymap);
+
     displayListings(L, mymap);
     displayPopularArea(L, mymap);
+    displayAddresses(L, mymap);
 }
 
 async function displayAddresses(L, mymap){
-    const data = await getData("addresses");
-
-    for (let elem in data) {
-        const lat = data[elem].lat;
-        const long = data[elem].long;
+    const data = {};
+    const addressSocket = new WebSocket(
+        'ws://localhost:3700/airbnb-service/addresses'
+    );
+    addressSocket.onmessage = (event) => {
+        let data = JSON.parse(event.data);
+        const lat = data.lat;
+        const long = data.long;
 
         L.circle([lat, long], 10, {
-            color: '#0eff84',
-            fillColor: '#0eff84',
+            color: '#a504f5',
+            fillColor: '#a504f5',
             fillOpacity: 0.05
         }).addTo(mymap)
     }
+
 }
 
 async function displayListings(L, mymap){
