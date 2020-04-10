@@ -12,13 +12,11 @@ object HouseAddress {
 
   def parse(ws: Seq[String]):Try[HouseAddress] ={
 
-    if(ws.length < 21) return Failure(new Exception("Unable to Parse String"))
-
     val address = ws(1)
     val rooms = ws(2).toInt
-    val price=Try(ws(4).toLong).getOrElse(0L)
+    val price= computeHouseNightlyPrice(ws(4))
     val landSize=Try(ws(13).toLong).getOrElse(0L)
-    val coordinates = Coordinates.parse(elements(ws, 17, 18))
+    val coordinates = Coordinates.parse(elements(ws, 17,18))
     val isHotel: Boolean = rooms >=5
     val availability: Boolean = true
     val decision = Decision.parse("F")
