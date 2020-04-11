@@ -1,16 +1,19 @@
 package backend
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.actor.Status.Success
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{DELETE, GET, OPTIONS, POST, PUT}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{`Access-Control-Allow-Credentials`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Methods`, `Access-Control-Allow-Origin`, `Access-Control-Max-Age`}
+import akka.http.scaladsl.model.ws.{Message, TextMessage}
 import akka.http.scaladsl.server.{Directive0, Route}
 import akka.http.scaladsl.server.Directives.{pathPrefix, _}
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
-import akka.stream.ActorMaterializer
+import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.scaladsl.{Flow, Sink, Source}
 import app.{HouseAddress, Listing, PopularArea}
+import org.apache.spark.streaming.dstream.DStream
 import spray.json._
 
 import scala.concurrent.duration.DurationLong
@@ -20,8 +23,10 @@ object WebServer {
 
 
   def getAddressJson(addresses: Seq[Try[HouseAddress]]): String ={
+    println(s"Starting serialization of addresses")
     import AddressProtocol._
     val addressSerialize = addresses.flatMap(_.toOption).toJson.prettyPrint
+    println(s"Completed address serialization")
     addressSerialize
   }
 
@@ -37,33 +42,33 @@ object WebServer {
     popularAreaSerialize
   }
 
+  def wsAddressFlow(wsSource: Source[Try[HouseAddress], Any]):Flow[Message, Message, Any] =
+    Flow.fromSinkAndSource(
+      Sink.ignore,
+      wsSource
+        .filter(address => address.get.availability)
+        .map(address => {
+          import AddressProtocol._
+          TextMessage.Strict(address.get.toJson.prettyPrint)
+        })
+    )
+
   def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]]) {
 
     implicit val system = ActorSystem("my-system")
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
-    val cors = new CORSHandler {}
+//    val wsSource = Source(addresses.to[scala.collection.immutable.Iterable])
 
+    val cors = new CORSHandler {}
     val addressSerialize = getAddressJson(addresses)
     val listingsSerialize = getListingJson(listings)
     val popularAreaSerialize = getPopularAreaJson(popularAreas)
-
     val route: Route =
       pathPrefix("airbnb-service") {
         //Necessary to let the browser make OPTIONS requests as it likes to do
-        pathPrefix("addresses"){
-          pathEnd{
-            concat(
-              options {
-                cors.corsHandler(complete(StatusCodes.OK))
-              },
-              get{
-                cors.corsHandler (complete(HttpEntity(ContentTypes.`application/json`, addressSerialize)))
-              }
-            )
-          }
-        } ~ pathPrefix("listings"){
+         pathPrefix("listings"){
           pathEnd{
             concat(
               options {
@@ -88,11 +93,36 @@ object WebServer {
         }
     }
 
-    val bindingFuture = Http().bindAndHandle(route, "localhost", 3700)
+    val bindingFuture = Http().bindAndHandle(route, "localhost",3700)
 
     println(s"Addresses online at http://localhost:3700/airbnb-service/addresses\n")
     println(s"Listings online at http://localhost:3700/airbnb-service/listings\n")
     println(s"Listings online at http://localhost:3700/airbnb-service/popularArea\n")
+  }
+
+  def sendViaWebsocket(addresses: Seq[Try[HouseAddress]]) {
+    implicit val system = ActorSystem("my-system")
+    implicit val materializer = ActorMaterializer()
+    implicit val executionContext = system.dispatcher
+    val cors = new CORSHandler {}
+    val wsSource = Source(addresses.to[scala.collection.immutable.Iterable])
+    val route: Route =
+      pathPrefix("airbnb-service") {
+        //Necessary to let the browser make OPTIONS requests as it likes to do
+        pathPrefix("addresses") {
+          pathEnd {
+            concat(
+              options {
+                cors.corsHandler(complete(StatusCodes.OK))
+              },
+              get {
+                handleWebSocketMessages(wsAddressFlow(wsSource))
+              }
+            )
+          }
+        }
+      }
+    Http().bindAndHandle(route, "localhost",3800)
   }
 }
 
