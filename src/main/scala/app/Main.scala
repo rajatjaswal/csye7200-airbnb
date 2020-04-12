@@ -9,6 +9,7 @@ import spark.SparkConnector
 import scala.io.{Codec, Source}
 import scala.util.{Failure, Try}
 import Helper.injectIsWithinPopular
+import akka.actor.ActorSystem
 import backend.WebServer
 
 object Main extends App{
@@ -38,6 +39,7 @@ object Main extends App{
     listing_source.close()
     popularArea_source.close()
 
+    implicit val system = ActorSystem("my-system")
     WebServer.initialize(cleansed_addresses, listingsInjected, popularAreas);
     SparkConnector.createNewSparkServer(listingsInjected)
 
