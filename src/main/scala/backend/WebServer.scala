@@ -56,8 +56,6 @@ object WebServer {
     )
 
   def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]])(implicit system: ActorSystem) {
-
-    implicit val system = ActorSystem("my-system")
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
