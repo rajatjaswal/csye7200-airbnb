@@ -14,3 +14,4 @@ libraryDependencies += "com.typesafe.akka" %% "akka-http" % "10.0.9"
 val sprayGroup = "io.spray"
 val sprayJsonVersion = "1.3.5"
 libraryDependencies ++= List("spray-json") map {c => sprayGroup %% c % sprayJsonVersion}
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
