@@ -1,5 +1,7 @@
 package spark
 
+import akka.HouseAddressActor
+import akka.actor.{ActorSystem, Props}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
@@ -9,12 +11,13 @@ import org.apache.spark.streaming.kafka010._
 import org.apache.spark._
 import org.apache.spark.sql.{SQLContext, SparkSession}
 import app.{HouseAddress, Listing}
+import backend.{CORSHandler, WebServer}
 
 import scala.util.Try
 
 object SparkConnector {
 
-  def createNewSparkServer(listings: Seq[Try[Listing]]) = {
+  def createNewSparkServer(listings: Seq[Try[Listing]])(implicit system: ActorSystem) = {
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> "localhost:9092",
@@ -41,11 +44,21 @@ object SparkConnector {
       Subscribe[String, String](topics, kafkaParams)
     )
 
-    val newAddresses = kafkaStream.map(record=>{
-      HouseAddress.parse(record.value().toString.split(",").toSeq)
-    }).flatMap(_.toOption)
 
-    newAddresses.print()
+    val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
+    WebServer.sendViaWebsocket(actor);
+    val newAddresses = kafkaStream.map(record=>{
+      val x =HouseAddress.parse(record.value().toString.split(",").toSeq)
+      x
+    })
+
+    newAddresses.foreachRDD( x => {
+      val addresses = x.collect()
+      if(!addresses.isEmpty){
+        println(addresses)
+        actor ! addresses.toSeq
+      }
+    })
 
     ssc.start()
     ssc.awaitTermination()

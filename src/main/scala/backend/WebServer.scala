@@ -1,7 +1,7 @@
 package backend
 
+import akka.GetAddreses
 import akka.actor.{ActorRef, ActorSystem}
-import akka.actor.Status.Success
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{DELETE, GET, OPTIONS, POST, PUT}
 import akka.http.scaladsl.model._
@@ -12,10 +12,12 @@ import akka.http.scaladsl.server.Directives.{pathPrefix, _}
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.stream.{ActorMaterializer, OverflowStrategy}
 import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.util.Timeout
 import app.{HouseAddress, Listing, PopularArea}
-import org.apache.spark.streaming.dstream.DStream
+import akka.pattern.ask
 import spray.json._
 
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationLong
 import scala.util.Try
 
@@ -53,9 +55,7 @@ object WebServer {
         })
     )
 
-  def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]]) {
-
-    implicit val system = ActorSystem("my-system")
+  def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]])(implicit system: ActorSystem) {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
@@ -100,12 +100,10 @@ object WebServer {
     println(s"Listings online at http://localhost:3700/airbnb-service/popularArea\n")
   }
 
-  def sendViaWebsocket(addresses: Seq[Try[HouseAddress]]) {
-    implicit val system = ActorSystem("my-system")
+  def sendViaWebsocket(actor: ActorRef)(implicit system: ActorSystem) {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
     val cors = new CORSHandler {}
-    val wsSource = Source(addresses.to[scala.collection.immutable.Iterable])
     val route: Route =
       pathPrefix("airbnb-service") {
         //Necessary to let the browser make OPTIONS requests as it likes to do
@@ -116,14 +114,18 @@ object WebServer {
                 cors.corsHandler(complete(StatusCodes.OK))
               },
               get {
-                handleWebSocketMessages(wsAddressFlow(wsSource))
+                implicit val timeout: Timeout = Timeout(5 seconds)
+                val addresses: Future[String] = (actor ? GetAddreses).mapTo[String]
+                cors.corsHandler (complete(addresses))
               }
             )
           }
         }
       }
-    Http().bindAndHandle(route, "localhost",3800)
+    var ws = Http().bindAndHandle(route, "localhost",3800)
+
   }
+
 }
 
 trait CORSHandler {
