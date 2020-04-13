@@ -26,10 +26,8 @@ object WebServer {
 
 
   def getAddressJson(addresses: Seq[Try[HouseAddress]]): String ={
-    println(s"Starting serialization of addresses")
     import AddressProtocol._
     val addressSerialize = addresses.flatMap(_.toOption).toJson.prettyPrint
-    println(s"Completed address serialization")
     addressSerialize
   }
 
@@ -47,7 +45,7 @@ object WebServer {
 
   def wsAddressFlow(wsSource: Source[String, Any]):Flow[Message, Message, _] =
     Flow.fromSinkAndSource(
-      Sink.ignore,
+      Sink.foreach(println),
       wsSource
         .map(address => {
           import AddressProtocol._
@@ -77,7 +75,8 @@ object WebServer {
               get {
                 implicit val timeout: Timeout = Timeout(5 seconds)
                 val addresses: Future[String] = (actor ? GetAddreses).mapTo[String]
-                handleWebSocketMessages(wsAddressFlow(Source.fromFuture(addresses)))
+
+                cors.corsHandler (complete(addresses))
               }
             )
           }
