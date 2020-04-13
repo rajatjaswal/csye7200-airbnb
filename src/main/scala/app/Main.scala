@@ -40,9 +40,7 @@ object Main extends App{
     popularArea_source.close()
 
     implicit val system = ActorSystem("my-system")
-    WebServer.initialize(cleansed_addresses, listingsInjected, popularAreas);
-    SparkConnector.createNewSparkServer(listingsInjected)
-
+    SparkConnector.createNewSparkServer(cleansed_addresses, listingsInjected, popularAreas)
     address_source.close()
   }
 }

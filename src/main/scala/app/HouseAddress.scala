@@ -13,7 +13,7 @@ object HouseAddress {
   def parse(ws: Seq[String]):Try[HouseAddress] ={
 
     val address = ws(1)
-    val rooms = ws(2).toInt
+    val rooms = Try(ws(2).toInt).getOrElse(0)
     val price= computeHouseNightlyPrice(ws(4))
     val landSize=Try(ws(13).toLong).getOrElse(0L)
     val coordinates = Coordinates.parse(elements(ws, 17,18))
