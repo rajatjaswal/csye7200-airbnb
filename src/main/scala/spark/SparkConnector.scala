@@ -5,19 +5,20 @@ import akka.actor.{ActorSystem, Props}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import org.apache.spark.streaming.kafka010.KafkaUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark._
 import org.apache.spark.sql.{SQLContext, SparkSession}
-import app.{HouseAddress, Listing}
+import app.{HouseAddress, Listing, PopularArea}
 import backend.{CORSHandler, WebServer}
 
 import scala.util.Try
 
 object SparkConnector {
 
-  def createNewSparkServer(listings: Seq[Try[Listing]])(implicit system: ActorSystem) = {
+  def createNewSparkServer(cleansed_addresses: Seq[Try[HouseAddress]],listings: Seq[Try[Listing]], popularAreas:Seq[Try[PopularArea]])(implicit system: ActorSystem) = {
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> "localhost:9092",
@@ -34,8 +35,9 @@ object SparkConnector {
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
-    val model = TrainModel.trainModel(rdd, sqlContext)
-    model.write.overwrite().save("trained-model")
+//    val model = TrainModel.trainModel(rdd, sqlContext)
+//    model.write.overwrite().save("trained-model")
+
     val topics = Array("airbnb")
 
     val kafkaStream = KafkaUtils.createDirectStream[String, String](
@@ -44,9 +46,8 @@ object SparkConnector {
       Subscribe[String, String](topics, kafkaParams)
     )
 
-
     val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
-    WebServer.sendViaWebsocket(actor);
+    WebServer.initialize(cleansed_addresses, listings, popularAreas, actor);
     val newAddresses = kafkaStream.map(record=>{
       val x =HouseAddress.parse(record.value().toString.split(",").toSeq)
       x
