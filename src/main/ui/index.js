@@ -60,19 +60,19 @@ async function displayAddresses(L, mymap){
                 const lat = address.lat;
                 const long = address.long;
                 if (address.decision) {
-                    L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup("Non-Potential Address");
-                    L.circle([lat, long], 40, {
-                        color: '#52e00b',
-                        fillColor: '#52e00b',
-                        fillOpacity: 1
-                    }).addTo(mymap).bindPopup("Potential Address").openPopup();
+                    L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup("Potential Address").openPopup();;
+                    // L.circle([lat, long], 40, {
+                    //     color: '#52e00b',
+                    //     fillColor: '#52e00b',
+                    //     fillOpacity: 1
+                    // }).addTo(mymap).bindPopup("Potential Address")
                 } else {
                     L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup("Non-Potential Address");
-                    L.circle([lat, long], 40, {
-                        color: '#939360',
-                        fillColor: '#939360',
-                        fillOpacity: 1
-                    }).addTo(mymap).bindPopup("Non-Potential Address");
+                    // L.circle([lat, long], 40, {
+                    //     color: '#939360',
+                    //     fillColor: '#939360',
+                    //     fillOpacity: 1
+                    // }).addTo(mymap).bindPopup("Non-Potential Address");
                 }
                 // L.circle([lat, long], 200, options).addTo(mymap)
             })
