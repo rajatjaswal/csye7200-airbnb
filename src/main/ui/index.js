@@ -40,20 +40,31 @@ function loadMap(){
 async function displayAddresses(L, mymap){
     const data = {};
     const addressSocket = new WebSocket(
-        'ws://localhost:3800/airbnb-service/addresses'
+        'ws://localhost:3700/airbnb-service/addresses'
     );
     addressSocket.onmessage = (event) => {
         let data = JSON.parse(event.data);
-        const lat = data.lat;
-        const long = data.long;
 
-        L.circle([lat, long], 10, {
-            color: '#a504f5',
-            fillColor: '#a504f5',
-            fillOpacity: 0.05
-        }).addTo(mymap)
+        if (data.length > 0) {
+            data.map(address => {
+                const lat = address.lat;
+                const long = address.long;
+                if (address.decision) {
+                    L.circle([lat, long], 10, {
+                        color: '#a504f5',
+                        fillColor: '#a504f5',
+                        fillOpacity: 0.05
+                    }).addTo(mymap)
+                } else {
+                    L.circle([lat, long], 10, {
+                        color: '#33f0c9',
+                        fillColor: '#33f0c9',
+                        fillOpacity: 0.05
+                    }).addTo(mymap)
+                }
+            })
+        }
     }
-
 }
 
 async function displayListings(L, mymap){
