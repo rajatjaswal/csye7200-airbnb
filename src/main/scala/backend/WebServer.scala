@@ -43,21 +43,9 @@ object WebServer {
     popularAreaSerialize
   }
 
-  def wsAddressFlow(wsSource: Source[String, Any]):Flow[Message, Message, _] =
-    Flow.fromSinkAndSource(
-      Sink.foreach(println),
-      wsSource
-        .map(address => {
-          import AddressProtocol._
-          TextMessage.Strict(address)
-        })
-    )
-
   def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
-
-//    val wsSource = Source(addresses.to[scala.collection.immutable.Iterable])
 
     val cors = new CORSHandler {}
     val addressSerialize = getAddressJson(addresses)
