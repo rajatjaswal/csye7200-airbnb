@@ -37,9 +37,9 @@ object SparkConnector {
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
-   val model = TrainModel.trainModel(rdd, sqlContext)
-   model.write.overwrite().save("trained-model")
-    // val model = LogisticRegressionModel.load("trained-model")
+//   val model = TrainModel.trainModel(rdd, sqlContext)
+//   model.write.overwrite().save("trained-model")
+     val model = LogisticRegressionModel.load("trained-model")
     val topics = Array("airbnb")
 
     val kafkaStream = KafkaUtils.createDirectStream[String, String](
@@ -63,6 +63,9 @@ object SparkConnector {
           val addr = TrainModel.getDecisionFromModel(df, model, sqlContext, sc);
           println(addr.collect().toSeq)
           actor ! addr.collect().toSeq;
+        }else {
+          val addr = mutable.Seq[HouseAddress]()
+          actor ! addr
         }
       }else{
         val addr = mutable.Seq[HouseAddress]()
