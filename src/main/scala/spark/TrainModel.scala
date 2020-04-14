@@ -56,8 +56,6 @@ object TrainModel {
 
   def getDecisionFromModel(df: DataFrame, model: LogisticRegressionModel, sqlContext: SparkSession, sc: SparkContext): RDD[HouseAddress] = {
     import sqlContext.implicits._
-    import org.apache.spark.sql.Encoders
-    import app.Function._
     val featureColumns = Array("latitude", "longitude")
     val assembler = new VectorAssembler().setInputCols(featureColumns).setOutputCol("features")
     val df2 = assembler.transform(df)
