@@ -22,6 +22,9 @@ class HouseAddressActor extends Actor {
     case x:Int => {
       len += x
     }
-    case _ => "Invalid"
+
+    case _ => {
+      "Invalid"
+    }
   }
 }

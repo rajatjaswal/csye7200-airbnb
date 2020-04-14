@@ -15,6 +15,7 @@ import app.{HouseAddress, Listing, PopularArea}
 import backend.{CORSHandler, WebServer}
 import org.apache.spark.ml.classification.LogisticRegressionModel
 
+import scala.collection.mutable
 import scala.util.Try
 
 object SparkConnector {
@@ -36,9 +37,9 @@ object SparkConnector {
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
-    val model = TrainModel.trainModel(rdd, sqlContext)
-    model.write.overwrite().save("trained-model")
-//    val model = LogisticRegressionModel.load("trained-model")
+   val model = TrainModel.trainModel(rdd, sqlContext)
+   model.write.overwrite().save("trained-model")
+    // val model = LogisticRegressionModel.load("trained-model")
     val topics = Array("airbnb")
 
     val kafkaStream = KafkaUtils.createDirectStream[String, String](
@@ -55,10 +56,17 @@ object SparkConnector {
 
     newAddresses.foreachRDD( x => {
       if(!x.collect().isEmpty){
-        val rdd = sc.makeRDD(x.collect().toSeq.flatMap(_.toOption))
-        val df = sqlContext.createDataFrame(rdd)
-        val addr = TrainModel.getDecisionFromModel(df, model, sqlContext, sc);
-        actor ! addr.collect().toSeq;
+        val ha = x.collect().toSeq.flatMap(_.toOption).filter(p => (p.latitude,p.longitude)!=(0.0,0.0))
+        if(!ha.isEmpty) {
+          val rdd = sc.makeRDD(ha)
+          val df = sqlContext.createDataFrame(rdd)
+          val addr = TrainModel.getDecisionFromModel(df, model, sqlContext, sc);
+          println(addr.collect().toSeq)
+          actor ! addr.collect().toSeq;
+        }
+      }else{
+        val addr = mutable.Seq[HouseAddress]()
+        actor ! addr
       }
     })
 
