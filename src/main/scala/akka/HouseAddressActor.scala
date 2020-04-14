@@ -10,10 +10,10 @@ import scala.collection.mutable.Seq
 import collection.mutable.Buffer
 case object GetAddreses;
 class HouseAddressActor extends Actor {
-  var addresses:Seq[Try[HouseAddress]] = Seq.empty
+  var addresses:Seq[HouseAddress] = Seq.empty
   var len:ListBuffer[Int] = ListBuffer.empty;
   def receive = {
-    case newAddress :Seq[Try[HouseAddress]] => {
+    case newAddress :Seq[HouseAddress] => {
       addresses = newAddress
     }
     case GetAddreses => {
