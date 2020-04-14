@@ -13,12 +13,13 @@ import org.apache.spark._
 import org.apache.spark.sql.{SQLContext, SparkSession}
 import app.{HouseAddress, Listing, PopularArea}
 import backend.{CORSHandler, WebServer}
+import org.apache.spark.ml.classification.LogisticRegressionModel
 
 import scala.util.Try
 
 object SparkConnector {
 
-  def createNewSparkServer(cleansed_addresses: Seq[Try[HouseAddress]],listings: Seq[Try[Listing]], popularAreas:Seq[Try[PopularArea]])(implicit system: ActorSystem) = {
+  def createNewSparkServer(listings: Seq[Try[Listing]], popularAreas:Seq[Try[PopularArea]])(implicit system: ActorSystem) = {
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> "localhost:9092",
@@ -31,13 +32,13 @@ object SparkConnector {
 
     val conf = new SparkConf().setAppName("AirbnbProfitPotentials").setMaster("local[2]")
     val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(5))
+    val ssc = new StreamingContext(sc, Seconds(20))
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
-//    val model = TrainModel.trainModel(rdd, sqlContext)
-//    model.write.overwrite().save("trained-model")
-
+    val model = TrainModel.trainModel(rdd, sqlContext)
+    model.write.overwrite().save("trained-model")
+//    val model = LogisticRegressionModel.load("trained-model")
     val topics = Array("airbnb")
 
     val kafkaStream = KafkaUtils.createDirectStream[String, String](
@@ -47,17 +48,17 @@ object SparkConnector {
     )
 
     val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
-    WebServer.initialize(cleansed_addresses, listings, popularAreas, actor);
+    WebServer.initialize(listings, popularAreas, actor);
     val newAddresses = kafkaStream.map(record=>{
-      val x =HouseAddress.parse(record.value().toString.split(",").toSeq)
-      x
+      HouseAddress.parse(record.value().toString.split(","))
     })
 
     newAddresses.foreachRDD( x => {
-      val addresses = x.collect()
-      if(!addresses.isEmpty){
-        println(addresses)
-        actor ! addresses.toSeq
+      if(!x.collect().isEmpty){
+        val rdd = sc.makeRDD(x.collect().toSeq.flatMap(_.toOption))
+        val df = sqlContext.createDataFrame(rdd)
+        val addr = TrainModel.getDecisionFromModel(df, model, sqlContext, sc);
+        actor ! addr.collect().toSeq;
       }
     })
 
