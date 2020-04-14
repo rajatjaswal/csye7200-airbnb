@@ -34,37 +34,50 @@ function loadMap(){
 
     displayListings(L, mymap);
     displayPopularArea(L, mymap);
-    displayAddresses(L, mymap);
+
+    setInterval(function() {
+        displayAddresses(L, mymap);
+    }, 10000);
+}
+
+const icons = {
+    grey : L.icon({
+        iconUrl: '../resources/house-no.png',
+        iconSize: [20, 20], // size of the icon
+    }),
+    green : L.icon({
+        iconUrl: '../resources/house-yes.png',
+        iconSize: [20, 20], // size of the icon
+    })
 }
 
 async function displayAddresses(L, mymap){
-    const data = {};
-    const addressSocket = new WebSocket(
-        'ws://localhost:3700/airbnb-service/addresses'
-    );
-    addressSocket.onmessage = (event) => {
-        let data = JSON.parse(event.data);
+        const data = await getData("addresses");
 
+        console.log(data);
         if (data.length > 0) {
             data.map(address => {
                 const lat = address.lat;
                 const long = address.long;
                 if (address.decision) {
-                    L.circle([lat, long], 10, {
-                        color: '#a504f5',
-                        fillColor: '#a504f5',
-                        fillOpacity: 0.05
-                    }).addTo(mymap)
+                    L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup("Potential Address").openPopup();;
+                    // L.circle([lat, long], 40, {
+                    //     color: '#52e00b',
+                    //     fillColor: '#52e00b',
+                    //     fillOpacity: 1
+                    // }).addTo(mymap).bindPopup("Potential Address")
                 } else {
-                    L.circle([lat, long], 10, {
-                        color: '#33f0c9',
-                        fillColor: '#33f0c9',
-                        fillOpacity: 0.05
-                    }).addTo(mymap)
+                    L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup("Non-Potential Address");
+                    // L.circle([lat, long], 40, {
+                    //     color: '#939360',
+                    //     fillColor: '#939360',
+                    //     fillOpacity: 1
+                    // }).addTo(mymap).bindPopup("Non-Potential Address");
                 }
+                // L.circle([lat, long], 200, options).addTo(mymap)
             })
         }
-    }
+    // }
 }
 
 async function displayListings(L, mymap){
@@ -75,13 +88,13 @@ async function displayListings(L, mymap){
         const long = data[elem].long;
         const decision = data[elem].decision;
         const options = {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.2
+            color: '#426c51',
+            fillColor: '#426c51',
+            fillOpacity: 0.5
         };
         if(decision==0){
-            options.color="blue"
-            options.fillColor="#3197ff"
+            options.color="#ab9dab"
+            options.fillColor="#ab9dab"
         }
         L.circle([lat, long], 10, options).addTo(mymap)
     }
@@ -94,15 +107,9 @@ async function displayPopularArea(L, mymap){
         const lat = data[elem].lat;
         const long = data[elem].long;
         const address = data[elem].address;
-        const options = {
-            color: 'red',
-            fillColor: '#38ff19',
-            fillOpacity: 0.7
-        };
-        L.circle([lat, long], 200, options).addTo(mymap)
 
         L.marker([lat, long]).addTo(mymap)
-            .bindPopup(address).openPopup();
+            .bindPopup(address);
     }
 }
 
@@ -123,7 +130,8 @@ async function getData(type) {
         .then(data => {
             return data.json()
         })
-        .then(res => res);
+        .then(res => res)
+        .catch(err => {error: err});
 
     return data;
 }

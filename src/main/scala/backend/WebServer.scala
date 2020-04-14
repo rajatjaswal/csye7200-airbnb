@@ -26,10 +26,8 @@ object WebServer {
 
 
   def getAddressJson(addresses: Seq[Try[HouseAddress]]): String ={
-    println(s"Starting serialization of addresses")
     import AddressProtocol._
     val addressSerialize = addresses.flatMap(_.toOption).toJson.prettyPrint
-    println(s"Completed address serialization")
     addressSerialize
   }
 
@@ -45,21 +43,9 @@ object WebServer {
     popularAreaSerialize
   }
 
-  def wsAddressFlow(wsSource: Source[String, Any]):Flow[Message, Message, _] =
-    Flow.fromSinkAndSource(
-      Sink.ignore,
-      wsSource
-        .map(address => {
-          import AddressProtocol._
-          TextMessage.Strict(address)
-        })
-    )
-
   def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
-
-//    val wsSource = Source(addresses.to[scala.collection.immutable.Iterable])
 
     val cors = new CORSHandler {}
     val addressSerialize = getAddressJson(addresses)
@@ -77,7 +63,8 @@ object WebServer {
               get {
                 implicit val timeout: Timeout = Timeout(5 seconds)
                 val addresses: Future[String] = (actor ? GetAddreses).mapTo[String]
-                handleWebSocketMessages(wsAddressFlow(Source.fromFuture(addresses)))
+
+                cors.corsHandler (complete(addresses))
               }
             )
           }

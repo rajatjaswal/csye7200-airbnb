@@ -32,7 +32,7 @@ object SparkConnector {
 
     val conf = new SparkConf().setAppName("AirbnbProfitPotentials").setMaster("local[2]")
     val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(20))
+    val ssc = new StreamingContext(sc, Seconds(10))
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
