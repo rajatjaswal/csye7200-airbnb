@@ -2,7 +2,7 @@ package app
 
 import org.scalatest.{FlatSpec, Matchers}
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 class ListingSpec extends FlatSpec with Matchers{
 

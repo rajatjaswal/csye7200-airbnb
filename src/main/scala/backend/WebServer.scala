@@ -2,7 +2,6 @@ package backend
 
 import akka.GetAddreses
 import akka.actor.{ActorRef, ActorSystem}
-import akka.http.impl.engine.ws.UpgradeToWebSocketResponseHeader
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.HttpMethods.{DELETE, GET, OPTIONS, POST, PUT}
 import akka.http.scaladsl.model._
@@ -45,11 +44,9 @@ object WebServer {
     popularAreaSerialize
   }
 
-  def initialize(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
-    implicit val materializer = ActorMaterializer()
-    implicit val executionContext = system.dispatcher
-
+  def getRoutes(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef): Route = {
     val cors = new CORSHandler {}
+
     val listingsSerialize = getListingJson(listings)
     val popularAreaSerialize = getPopularAreaJson(popularAreas)
     val route: Route =
@@ -92,9 +89,16 @@ object WebServer {
             )
           }
         }
-    }
+      }
 
-    val bindingFuture = Http().bindAndHandle(route, "localhost",3700)
+    route
+  }
+
+  def initialize(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
+    implicit val materializer = ActorMaterializer()
+    implicit val executionContext = system.dispatcher
+
+    val bindingFuture = Http().bindAndHandle(getRoutes(listings, popularAreas, actor), "localhost",3700)
 
     println(s"Addresses online at http://localhost:3700/airbnb-service/addresses\n")
     println(s"Listings online at http://localhost:3700/airbnb-service/listings\n")
