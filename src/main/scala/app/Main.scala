@@ -28,19 +28,15 @@ object Main extends App{
     val listings:Seq[Try[Listing]] = listing_ingester(listing_source).toSeq
     val popularAreas:Seq[Try[PopularArea]] = popularArea_ingestor(popularArea_source).toSeq
     val listingsInjected:Seq[Try[Listing]] = injectIsWithinPopular(popularAreas, listings)
-//    println(addresses);
     val xs=listingsInjected.filter(l => l.get.isWithinPopular==1)
-    val cleansed_addresses = addresses.filter(a => a.get.coordinates!=Coordinates(0.0,0.0))
-    println(cleansed_addresses);
     println(listings.length)
     println(xs.length)
-//    println(listingsInjected.toList)
     println(popularAreas)
     listing_source.close()
     popularArea_source.close()
 
     implicit val system = ActorSystem("my-system")
-    SparkConnector.createNewSparkServer(cleansed_addresses, listingsInjected, popularAreas)
+    SparkConnector.createNewSparkServer(listingsInjected, popularAreas)
     address_source.close()
   }
 }

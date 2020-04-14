@@ -25,9 +25,11 @@ import scala.util.Try
 object WebServer {
 
 
-  def getAddressJson(addresses: Seq[Try[HouseAddress]]): String ={
+  def getAddressJson(addresses: Seq[HouseAddress]): String ={
+    println(s"Starting serialization of addresses")
     import AddressProtocol._
-    val addressSerialize = addresses.flatMap(_.toOption).toJson.prettyPrint
+    val addressSerialize = addresses.toJson.prettyPrint
+    println(s"Completed address serialization")
     addressSerialize
   }
 
@@ -43,12 +45,11 @@ object WebServer {
     popularAreaSerialize
   }
 
-  def initialize(addresses: Seq[Try[HouseAddress]], listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
+  def initialize(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
     val cors = new CORSHandler {}
-    val addressSerialize = getAddressJson(addresses)
     val listingsSerialize = getListingJson(listings)
     val popularAreaSerialize = getPopularAreaJson(popularAreas)
     val route: Route =

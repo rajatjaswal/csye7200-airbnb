@@ -22,12 +22,12 @@ object HouseAddress {
     val decision = Decision.parse("F")
 
     import Function._
-    val fy = lift2(uncurried2((apply _).curried))
-    for(f <- fy(coordinates, decision)) yield f(price)(landSize)(address)(rooms)(isHotel)(availability)
+    val fy = lift(uncurried((apply _).curried))
+    for(f <- fy(decision)) yield f(coordinates.get.lat)(coordinates.get.longitude)(price)(landSize)(address)(rooms)(isHotel)(availability)
   }
 
   def addressesWithinMile(mile: Double): Seq[HouseAddress] = ???
 }
-case class HouseAddress(coordinates: Coordinates, decision: Decision, price: Long, landSize: Long, address: String, rooms: Int, isHotel: Boolean, availability: Boolean){
+case class HouseAddress(decision: Decision, latitude: Double, longitude: Double, price: Long, landSize: Long, address: String, rooms: Int, isHotel: Boolean, availability: Boolean){
 
 }

@@ -8,8 +8,8 @@ object AddressProtocol extends DefaultJsonProtocol {
   implicit object houseAddressFormat extends RootJsonFormat[HouseAddress] {
     def write(h: HouseAddress) =
       JsObject(
-        "lat" -> JsNumber(h.coordinates.lat),
-        "long" -> JsNumber(h.coordinates.longitude),
+        "lat" -> JsNumber(h.latitude),
+        "long" -> JsNumber(h.longitude),
         "address" -> JsString(h.address),
         "decision" -> JsBoolean(h.decision.decision),
         "availability" -> JsBoolean(h.availability)
