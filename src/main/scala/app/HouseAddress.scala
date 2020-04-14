@@ -11,7 +11,6 @@ object HouseAddress {
   }
 
   def parse(ws: Seq[String]):Try[HouseAddress] ={
-
     val address = ws(1)
     val rooms = Try(ws(2).toInt).getOrElse(0)
     val price= computeHouseNightlyPrice(ws(4))

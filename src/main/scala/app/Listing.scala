@@ -12,6 +12,10 @@ object Listing {
   }
 
   def parse(ws: Seq[String]):Try[Listing] ={
+    if(!ws.length.equals(39)){
+      return Failure(new Exception("Invalid Data"));
+    }
+
     val listingId = Try(ws.head.toLong).getOrElse(0L)
     val hostId = Try(ws(1).toLong).getOrElse(0L)
     val address = ListingAddress.parse(elements(ws, 2))

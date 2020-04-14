@@ -3,7 +3,7 @@ package app
 import app.Helper.elements
 import ingestion.Ingestible
 
-import scala.util.Try
+import scala.util.{Failure, Try}
 
 object PopularArea {
   trait IngestiblePopularArea extends Ingestible[PopularArea] {
@@ -11,6 +11,10 @@ object PopularArea {
   }
 
   def parse(ws: Seq[String]):Try[PopularArea] ={
+
+    if(!ws.length.equals(4)){
+      return Failure(new Exception("Invalid Data"));
+    }
 
     val place = ws.head
     val coordinates= Coordinates.parse(elements(ws, 1, 2))
