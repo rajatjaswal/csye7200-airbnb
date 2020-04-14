@@ -45,15 +45,6 @@ object WebServer {
     popularAreaSerialize
   }
 
-  def wsAddressFlow(wsSource: Source[String, Any]):Flow[Message, Message, _] =
-    Flow.fromSinkAndSource(
-      Sink.ignore,
-      wsSource
-        .map(address => {
-          TextMessage.Strict(address)
-        })
-    )
-
   def initialize(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem) {
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
