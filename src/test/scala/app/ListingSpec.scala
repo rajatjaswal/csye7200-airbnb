@@ -2,6 +2,8 @@ package app
 
 import org.scalatest.{FlatSpec, Matchers}
 
+import scala.util.{Failure, Success}
+
 class ListingSpec extends FlatSpec with Matchers{
 
   "Listing" should """return true if is withinMileOfArea of a PopularArea of same coordinates """  in
@@ -60,5 +62,19 @@ class ListingSpec extends FlatSpec with Matchers{
     tuple should matchPattern {
       case (null,0, _) =>
     }
+  }
+
+  behavior of "Listing Parse"
+
+  it should "return Success of true for valid " in {
+    val listingString ="19490757,59845433,Westmeadows,Hume,Westmeadows,VIC,3049,-37.67656153,144.873996,House,Private room,2,1,1,65,,,,0,1,0,1,1125,4 weeks ago,t,0,16,40,311,253,98,10,10,10,10,10,10,8,14.54"
+    val seqListing = listingString.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1)
+    val listing = Listing.parse(seqListing)
+    listing shouldBe a [Success[ListingAddress]]
+  }
+  it should "return Failure for invalid Data" in {
+    val seqListing = Seq("abc", "basud", "asd")
+    val listing = Listing.parse(seqListing)
+    listing shouldBe a [Failure[_]]
   }
 }
