@@ -25,7 +25,6 @@ object PopularArea {
     for(f <- fy(coordinates)) yield f(place)(reviews)
   }
 }
-case class TripAdvisor(popularAreas: List[PopularArea])
 
 case class PopularArea(coordinates: Coordinates, place: String, rating: Int) {
 

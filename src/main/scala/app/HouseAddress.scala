@@ -11,6 +11,9 @@ object HouseAddress {
   }
 
   def parse(ws: Seq[String]):Try[HouseAddress] ={
+    if(!ws.length.equals(21)){
+      return Failure(new Exception(s"Invalid Data"))
+    }
     val address = ws(1)
     val rooms = Try(ws(2).toInt).getOrElse(0)
     val price= computeHouseNightlyPrice(ws(4))
@@ -24,8 +27,6 @@ object HouseAddress {
     val fy = lift(uncurried((apply _).curried))
     for(f <- fy(decision)) yield f(coordinates.get.lat)(coordinates.get.longitude)(price)(landSize)(address)(rooms)(isHotel)(availability)
   }
-
-  def addressesWithinMile(mile: Double): Seq[HouseAddress] = ???
 }
 case class HouseAddress(decision: Decision, latitude: Double, longitude: Double, price: Long, landSize: Long, address: String, rooms: Int, isHotel: Boolean, availability: Boolean){
 
