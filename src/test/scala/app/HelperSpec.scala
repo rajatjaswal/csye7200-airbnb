@@ -10,8 +10,15 @@ object HelperSpec {
   val pop2 =  PopularArea(Coordinates(-37.8098,144.9652), "Area2", 342)
   val pop3 =  PopularArea(Coordinates(-37.8047,144.9717), "Area3", 871)
 
+  val listing1 = Listing.parse("19490757,59845433,Westmeadows,Hume,Westmeadows,VIC,3049,-37.67656153,144.873996,House,Private room,2,1,1,65,,,,0,1,0,1,1125,4 weeks ago,t,0,16,40,311,253,98,10,10,10,10,10,10,8,14.54".split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1))
+  val listing2 = Listing.parse("5552321,28789055,Melbourne,Melbourne,Melbourne,VIC,3003,-37.82275411,144.9635545,Apartment,Entire home/apt,6,2,2,188,,,149,45,4,10,1,1125,5 days ago,t,11,39,63,147,360,96,10,9,10,10,10,10,9,11.18".split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1))
+
   def getPopularArea(): PopularArea = {
     pop1
+  }
+
+  def getListings(): Seq[Try[Listing]] = {
+    Seq(listing1,listing2)
   }
 
   def getPopularAreas(): Seq[Try[PopularArea]] = {
