@@ -31,7 +31,7 @@ object SparkConnector {
 
     val conf = new SparkConf().setAppName("AirbnbProfitPotentials").setMaster("local[2]")
     val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, Seconds(5))
+    val ssc = new StreamingContext(sc, Seconds(10))
     val sqlContext = SparkSession.builder().getOrCreate()
 
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
@@ -55,10 +55,8 @@ object SparkConnector {
 
     newAddresses.foreachRDD( x => {
       val addresses = x.collect()
-      if(!addresses.isEmpty){
-        println(addresses)
+        println(addresses.toSeq)
         actor ! addresses.toSeq
-      }
     })
 
     ssc.start()
