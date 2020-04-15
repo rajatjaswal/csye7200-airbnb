@@ -11,7 +11,7 @@ object Helper {
   }
 
   def injectIsWithinPopular(popAreas: Seq[Try[PopularArea]], listings: Seq[Try[Listing]]): Seq[Try[Listing]] = {
-    val mile = 3.0
+    val mile = 4.0
     listings.map(l => {
       for (lx <- l; (popArea, isBoolean, minDistance)  = lx.hasClosestPopularArea(mile, lx, popAreas)) yield lx.copy(isWithinPopular = isBoolean, minDistance = minDistance , closestPopularArea = popArea)
     })

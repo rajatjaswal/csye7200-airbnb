@@ -23,7 +23,7 @@ class TrainModelSpec extends FlatSpec with SparkSpec with GivenWhenThen with Mat
     val _sc = sc
     val rdd = _sc.makeRDD(Listings)
     val sqlContext = SparkSession.builder().getOrCreate()
-    val featureColumns = Array("latitude", "longitude")
+    val featureColumns = Array("latitude", "longitude","price","bedrooms")
     val indexLabelColumn = "isWithinPopular"
     val model = TrainModel.trainModel(rdd, sqlContext);
     val obsDF = sqlContext.createDataFrame(rdd);
@@ -42,6 +42,6 @@ class TrainModelSpec extends FlatSpec with SparkSpec with GivenWhenThen with Mat
     val seqAddr = rddAddress.collect().toSeq
     seqAddr shouldBe a [Seq[_]]
     val decision = seqAddr.head.decision.decision;
-    assert(decision==false)
+    assert(decision==true)
   }
 }

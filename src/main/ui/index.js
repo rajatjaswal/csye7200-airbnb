@@ -55,12 +55,14 @@ async function displayAddresses(L, mymap){
         const data = await getData("addresses");
 
         console.log(data);
+        let watch = 0;
         if (data.length > 0) {
             data.map(address => {
                 const lat = address.lat;
                 const long = address.long;
                 const averagePrice = address.average_price;
                 if (address.decision) {
+                    if(averagePrice > 100) watch++;
                     L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] `).openPopup();;
                     // L.circle([lat, long], 40, {
                     //     color: '#52e00b',
@@ -77,6 +79,7 @@ async function displayAddresses(L, mymap){
                 }
                 // L.circle([lat, long], 200, options).addTo(mymap)
             })
+            console.log(watch);
         }
     // }
 }
