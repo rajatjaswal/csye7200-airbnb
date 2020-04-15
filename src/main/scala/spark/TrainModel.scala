@@ -21,7 +21,7 @@ object TrainModel {
 
     val splitSeed = 3093
     val Array(trainingData, testData) = df.randomSplit(Array(0.8, 0.2), splitSeed)
-    val lr = new LogisticRegression().setMaxIter(300).setRegParam(0.01).setElasticNetParam(0.92)
+    val lr = new LogisticRegression().setMaxIter(370).setRegParam(0.01).setElasticNetParam(0.92)
     val model = lr.fit(trainingData)
     val predictions = model.transform(testData)
     predictions.show(30)
@@ -77,7 +77,7 @@ object TrainModel {
     df3.printSchema();
     val address = df3.map(row =>
       HouseAddress(Decision.parse(
-        if(row.getDouble(12)==1.0) {
+        if(row.getDouble(12)==0.0) {
           "T"
         } else {
           "F"
