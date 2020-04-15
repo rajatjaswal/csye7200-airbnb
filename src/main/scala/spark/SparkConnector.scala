@@ -47,7 +47,7 @@ object SparkConnector {
 
     newAddresses.foreachRDD( x => {
       if(!x.collect().isEmpty){
-        val ha = x.collect().toSeq.flatMap(_.toOption).filter(p => (p.latitude,p.longitude)!=(0.0,0.0))
+        val ha = x.collect().toSeq.flatMap(_.toOption).filter(p => p.latitude != 0.0 && p.longitude !=0.0 && p.price !=0)
         if(!ha.isEmpty) {
           val rdd = sc.makeRDD(ha)
           val df = sqlContext.createDataFrame(rdd)

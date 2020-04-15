@@ -59,7 +59,7 @@ async function displayAddresses(L, mymap){
             data.map(address => {
                 const lat = address.lat;
                 const long = address.long;
-                const averagePrice = data[elem].average_price;
+                const averagePrice = address.average_price;
                 if (address.decision) {
                     L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] `).openPopup();;
                     // L.circle([lat, long], 40, {

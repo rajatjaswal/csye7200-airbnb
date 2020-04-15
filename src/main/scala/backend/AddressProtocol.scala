@@ -13,7 +13,7 @@ object AddressProtocol extends DefaultJsonProtocol {
         "address" -> JsString(h.address),
         "decision" -> JsBoolean(h.decision.decision),
         "availability" -> JsBoolean(h.availability),
-        "average_price" -> JsNumber(h.price)
+        "average_price" -> JsNumber(h.price/h.rooms)
       )
     override def read(json: JsValue): HouseAddress = ???
   }
