@@ -23,6 +23,7 @@ object Listing {
     val accommodates = Try(ws(11).toInt).getOrElse(0)
     val bedrooms = Try(ws(12).toInt).getOrElse(0)
     val price = Try(ws(14).toLong).getOrElse(0L)
+    val avgPrice = Try(price/bedrooms).getOrElse(price)
     val number_of_reviews = Try(ws(29).toInt).getOrElse(0)
     val review_scores_rating = Try(ws(30).toDouble).getOrElse(0.0)
     val average_service_review_scores = Try(((ws(31).toInt + ws(32).toInt + ws(33).toInt + ws(36).toInt + ws(34).toInt + ws(35).toInt)/6).toDouble).getOrElse(0.0)
@@ -33,13 +34,13 @@ object Listing {
 
     import Function._
     val fy = lift(uncurried((apply _).curried))
-    for(f <- fy(address)) yield f(coordinates.get.lat)(coordinates.get.longitude)(listingId)(hostId)(accommodates)(bedrooms)(price)(number_of_reviews)(review_scores_rating)(average_service_review_scores)(reviews_per_month)(isWithinMile)(minDistance)(closestPopularArea)
+    for(f <- fy(address)) yield f(coordinates.get.lat)(coordinates.get.longitude)(listingId)(hostId)(accommodates)(bedrooms)(price)(number_of_reviews)(review_scores_rating)(average_service_review_scores)(reviews_per_month)(isWithinMile)(minDistance)(closestPopularArea)(avgPrice)
   }
 
   def addressesWithinMile(mile: Double): Seq[Listing] = ???
 }
-case class Listing(address: ListingAddress, latitude: Double, longitude: Double, listingId: Long, hostId: Long, accommodates: Int, bedrooms: Int, price: Long, number_of_reviews: Int, review_scores_rating: Double, average_service_review_scores: Double, reviews_per_month: Double, isWithinPopular: Int, minDistance: Double, closestPopularArea: PopularArea){
-  def hasClosestPopularArea(mile: Double, listing: Listing, popularAreas: Seq[Try[PopularArea]]): (PopularArea, Int, Double) ={
+case class Listing(address: ListingAddress, latitude: Double, longitude: Double, listingId: Long, hostId: Long, accommodates: Int, bedrooms: Int, price: Long, number_of_reviews: Int, review_scores_rating: Double, average_service_review_scores: Double, reviews_per_month: Double, isWithinPopular: Int, minDistance: Double, closestPopularArea: PopularArea, avgPrice: Long){
+  def hasClosestPopularArea(implicit mile: Double, listing: Listing, popularAreas: Seq[Try[PopularArea]]): (PopularArea, Int, Double) ={
     val closestPopularAreas = popularAreas.map{
       case Success(pop) => {
         val isWithin = isWithinMileOfArea(mile, pop);
@@ -47,8 +48,22 @@ case class Listing(address: ListingAddress, latitude: Double, longitude: Double,
       }
     }.filter(_._2==1)
 
-    if(closestPopularAreas.isEmpty) (null, 0, 0D)
-    else closestPopularAreas.minBy(_._3)
+    if(closestPopularAreas.isEmpty) (null, isWithinPriceRange(listing, "OUT"), 0D)
+    else {
+      val min = closestPopularAreas.minBy(_._3)
+      (min._1, isWithinPriceRange(listing, "IN"), min._3)
+    }
+  }
+
+  def isWithinPriceRange(listing: Listing, range: String): Int ={
+    val pricePerRoom = listing.avgPrice
+    var c:Boolean = false;
+    if(range.equals("IN")){
+      c = pricePerRoom >=40 && pricePerRoom <=100
+    }else {
+      c = pricePerRoom >=20 && pricePerRoom <=40
+    }
+    if(c) 1 else 0
   }
 
   def isWithinMileOfArea(mile: Double, popularArea: PopularArea): (Boolean, Double) = {

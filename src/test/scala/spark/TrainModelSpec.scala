@@ -7,10 +7,10 @@ import org.scalatest.{FlatSpec, GivenWhenThen, Matchers}
 
 class TrainModelSpec extends FlatSpec with SparkSpec with GivenWhenThen with Matchers{
   private val Listings = Seq(
-    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,1,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78)),
-    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,0,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78)),
-    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,0,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78)),
-    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,1,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78))
+    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,1,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78), 1),
+    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,0,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78), 1),
+    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,0,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78), 1),
+    Listing(ListingAddress("abc"),-32.12,145.1,1234,3422,3,2,245,100,98.0,6,24.5,1,2.2,PopularArea(Coordinates(-32.12,134.22),"abdd", 78), 1)
   )
 
   private val houseAddress = Seq(

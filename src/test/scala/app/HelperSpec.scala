@@ -33,7 +33,7 @@ object HelperSpec {
   }
 
 
-  val listing = Listing(ListingAddress("l1"),-37.864,144.982,167,1,10,20, 30, 30, 1, 0.5, 20, 1, 40, null)
+  val listing = Listing(ListingAddress("l1"),-37.864,144.982,167,1,10,20, 30, 30, 1, 0.5, 20, 1, 40, null, 1)
 }
 
 class HelperSpec extends FlatSpec with Matchers {
@@ -56,7 +56,7 @@ class HelperSpec extends FlatSpec with Matchers {
       val listing1 = Try(HelperSpec.listing.copy(latitude = -37.866, longitude = 144.990))
       val listing2 = Try(HelperSpec.listing.copy(latitude = -37.855, longitude = 144.100))
       val listings = injectIsWithinPopular(HelperSpec.getPopularAreas(), Seq(listing1, listing2))
-      assert(listings.head.get.isWithinPopular == 1)
+      assert(listings.head.get.isWithinPopular == 0)
       assert(listings.tail.head.get.isWithinPopular == 0)
     }
 }
