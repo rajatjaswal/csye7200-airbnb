@@ -14,7 +14,7 @@ class TrainModelSpec extends FlatSpec with SparkSpec with GivenWhenThen with Mat
   )
 
   private val houseAddress = Seq(
-    HouseAddress(Decision(false),-34.14,144.12,250,234500,"aaa",2,false,true)
+    HouseAddress(Decision(false),-34.14,144.12,250,234500,"aaa",2,false,true, 1)
   )
 
   behavior of "TrainModel"

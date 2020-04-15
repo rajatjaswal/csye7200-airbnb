@@ -1,6 +1,5 @@
 package app
 
-import app.HouseAddress.IngestibleHouseAddress
 import app.Listing.IngestibleListing
 import app.PopularArea.IngestiblePopularArea
 import ingestion.Ingest
@@ -27,6 +26,7 @@ object Main extends App{
     val xs=listingsInjected.filter(l => l.get.isWithinPopular==1)
     println(listings.length)
     println(xs.length)
+    println(1- (listings.length-xs.length).toDouble/listings.length)
     println(popularAreas)
     listing_source.close()
     popularArea_source.close()

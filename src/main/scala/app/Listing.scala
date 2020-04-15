@@ -39,15 +39,10 @@ object Listing {
 
   def addressesWithinMile(mile: Double): Seq[Listing] = ???
 }
-case class Listing(address: ListingAddress, latitude: Double, longitude: Double, listingId: Long, hostId: Long, accommodates: Int, bedrooms: Int, price: Long, number_of_reviews: Int, review_scores_rating: Double, average_service_review_scores: Double, reviews_per_month: Double, isWithinPopular: Int, minDistance: Double, closestPopularArea: PopularArea, avgPrice: Long){
-  def hasClosestPopularArea(implicit mile: Double, listing: Listing, popularAreas: Seq[Try[PopularArea]]): (PopularArea, Int, Double) ={
-    val closestPopularAreas = popularAreas.map{
-      case Success(pop) => {
-        val isWithin = isWithinMileOfArea(mile, pop);
-        (pop, if(isWithin._1) 1 else 0, isWithin._2)
-      }
-    }.filter(_._2==1)
 
+case class Listing(address: ListingAddress, latitude: Double, longitude: Double, listingId: Long, hostId: Long, accommodates: Int, bedrooms: Int, price: Long, number_of_reviews: Int, review_scores_rating: Double, average_service_review_scores: Double, reviews_per_month: Double, isWithinPopular: Int, minDistance: Double, closestPopularArea: PopularArea, avgPrice: Long){
+  def hasClosestPopularArea(listing: Listing, popularAreas: Seq[Try[PopularArea]]): (PopularArea, Int, Double) ={
+    val closestPopularAreas = Helper.calculatePopularAreas(popularAreas, latitude, longitude)
     if(closestPopularAreas.isEmpty) (null, isWithinPriceRange(listing, "OUT"), 0D)
     else {
       val min = closestPopularAreas.minBy(_._3)
@@ -59,28 +54,11 @@ case class Listing(address: ListingAddress, latitude: Double, longitude: Double,
     val pricePerRoom = listing.avgPrice
     var c:Boolean = false;
     if(range.equals("IN")){
-      c = pricePerRoom >=40 && pricePerRoom <=100
+      c = 30<=pricePerRoom && pricePerRoom <=100
     }else {
-      c = pricePerRoom >=20 && pricePerRoom <=40
+      c = pricePerRoom <=30
     }
     if(c) 1 else 0
-  }
-
-  def isWithinMileOfArea(mile: Double, popularArea: PopularArea): (Boolean, Double) = {
-    val lat1 = math.toRadians(latitude)
-    val long1 =  math.toRadians(longitude)
-    val lat2 = math.toRadians(popularArea.coordinates.lat)
-    val long2 = math.toRadians(popularArea.coordinates.longitude)
-
-    val dlon = long2 - long1;
-    val dlat = lat2 - lat1;
-    val a = math.pow(math.sin(dlat / 2), 2) + math.cos(lat1) * math.cos(lat2) * math.pow(math.sin(dlon / 2),2);
-
-    val c = 2 * math.asin(math.sqrt(a))
-
-    val r:Double = 3956
-
-    (c*r <= mile, c*r)
   }
 }
 

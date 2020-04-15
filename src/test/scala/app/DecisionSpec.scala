@@ -9,7 +9,7 @@ class DecisionSpec extends FlatSpec with Matchers{
 
   it should "return Success of true for T" in {
     val decision = Decision.parse("T")
-    decision shouldBe a [Success[Decision]]
+    decision shouldBe a [Success[_]]
     decision.get shouldBe a [Decision]
     decision.get.decision should matchPattern {
       case true =>
@@ -17,7 +17,7 @@ class DecisionSpec extends FlatSpec with Matchers{
   }
   it should "return Success of false for F" in {
     val decision = Decision.parse("F")
-    decision shouldBe a [Success[Decision]]
+    decision shouldBe a [Success[_]]
     decision.get shouldBe a [Decision]
     decision.get.decision should matchPattern {
       case false =>

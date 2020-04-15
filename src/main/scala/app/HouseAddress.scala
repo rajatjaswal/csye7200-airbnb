@@ -6,11 +6,7 @@ import ingestion.Ingestible
 
 object HouseAddress {
 
-  trait IngestibleHouseAddress extends Ingestible[HouseAddress] {
-    def fromString(w: String): Try[HouseAddress] = HouseAddress.parse(w.split(",").toSeq)
-  }
-
-  def parse(ws: Seq[String]):Try[HouseAddress] ={
+  def parse(ws: Seq[String], popularAreas:Seq[Try[PopularArea]]):Try[HouseAddress] ={
     if(!ws.length.equals(21)){
       return Failure(new Exception(s"Invalid Data"))
     }
@@ -22,12 +18,13 @@ object HouseAddress {
     val isHotel: Boolean = rooms >=5
     val availability: Boolean = true
     val decision = Decision.parse("F")
-
+    val closestPopularAreas = Helper.calculatePopularAreas(popularAreas, coordinates.get.lat, coordinates.get.longitude)
+    val isWithinPopularArea= if(closestPopularAreas.isEmpty) 0 else 1
     import Function._
     val fy = lift(uncurried((apply _).curried))
-    for(f <- fy(decision)) yield f(coordinates.get.lat)(coordinates.get.longitude)(price)(landSize)(address)(rooms)(isHotel)(availability)
+    for(f <- fy(decision)) yield f(coordinates.get.lat)(coordinates.get.longitude)(price)(landSize)(address)(rooms)(isHotel)(availability)(isWithinPopularArea)
   }
 }
-case class HouseAddress(decision: Decision, latitude: Double, longitude: Double, price: Long, landSize: Long, address: String, rooms: Int, isHotel: Boolean, availability: Boolean){
+case class HouseAddress(decision: Decision, latitude: Double, longitude: Double, price: Long, landSize: Long, address: String, rooms: Int, isHotel: Boolean, availability: Boolean, isWithinPopularArea: Int){
 
 }

@@ -28,21 +28,22 @@ object SparkConnector {
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
     val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
     WebServer.initialize(listings, popularAreas, actor);
-   val model = TrainModel.trainModel(rdd, sqlContext)
-   model.write.overwrite().save("trained-model")
-//     val model = LogisticRegressionModel.load("trained-model")
+//   val model = TrainModel.trainModel(rdd, sqlContext)
+//   model.write.overwrite().save("trained-model")
+     val model = LogisticRegressionModel.load("trained-model")
 
     val kafkaStream = createKafkaStream(ssc)
 
-    handleStreamMessages(kafkaStream, sc, sqlContext, model, actor)
+    handleStreamMessages(kafkaStream, sc, sqlContext, model, actor, popularAreas)
 
     ssc.start()
     ssc.awaitTermination()
   }
 
-  def handleStreamMessages(kafkaStream: InputDStream[ConsumerRecord[String, String]], sc:SparkContext, sqlContext: SparkSession, model: LogisticRegressionModel, actor:ActorRef) = {
+  def handleStreamMessages(kafkaStream: InputDStream[ConsumerRecord[String, String]], sc:SparkContext, sqlContext: SparkSession, model: LogisticRegressionModel, actor:ActorRef, popularAreas: Seq[Try[PopularArea]]) = {
     val newAddresses = kafkaStream.map(record=>{
-      HouseAddress.parse(record.value().toString.split(","))
+      val house = HouseAddress.parse(record.value().toString.split(","), popularAreas)
+      house
     })
 
     newAddresses.foreachRDD( x => {
