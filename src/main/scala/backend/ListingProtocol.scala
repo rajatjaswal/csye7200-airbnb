@@ -10,7 +10,8 @@ object ListingProtocol extends DefaultJsonProtocol{
         "lat" -> JsNumber(l.latitude),
         "long" -> JsNumber(l.longitude),
         "address" -> JsString(l.address.address),
-        "decision" -> JsNumber(l.isWithinPopular)
+        "decision" -> JsNumber(l.isWithinPopular),
+        "average_price" -> JsNumber(l.avgPrice)
       )
     override def read(json: JsValue): Listing = ???
   }

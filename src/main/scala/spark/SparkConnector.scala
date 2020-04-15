@@ -26,14 +26,14 @@ object SparkConnector {
 
    val (sc,ssc,sqlContext) = createSparkConfiguration();
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
+    val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
+    WebServer.initialize(listings, popularAreas, actor);
    val model = TrainModel.trainModel(rdd, sqlContext)
    model.write.overwrite().save("trained-model")
 //     val model = LogisticRegressionModel.load("trained-model")
 
     val kafkaStream = createKafkaStream(ssc)
 
-    val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
-    WebServer.initialize(listings, popularAreas, actor);
     handleStreamMessages(kafkaStream, sc, sqlContext, model, actor)
 
     ssc.start()
@@ -47,7 +47,7 @@ object SparkConnector {
 
     newAddresses.foreachRDD( x => {
       if(!x.collect().isEmpty){
-        val ha = x.collect().toSeq.flatMap(_.toOption).filter(p => (p.latitude,p.longitude)!=(0.0,0.0))
+        val ha = x.collect().toSeq.flatMap(_.toOption).filter(p => p.latitude != 0.0 && p.longitude !=0.0 && p.price !=0)
         if(!ha.isEmpty) {
           val rdd = sc.makeRDD(ha)
           val df = sqlContext.createDataFrame(rdd)
