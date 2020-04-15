@@ -59,15 +59,16 @@ async function displayAddresses(L, mymap){
             data.map(address => {
                 const lat = address.lat;
                 const long = address.long;
+                const averagePrice = data[elem].average_price;
                 if (address.decision) {
-                    L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup("Potential Address").openPopup();;
+                    L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] `).openPopup();;
                     // L.circle([lat, long], 40, {
                     //     color: '#52e00b',
                     //     fillColor: '#52e00b',
                     //     fillOpacity: 1
                     // }).addTo(mymap).bindPopup("Potential Address")
                 } else {
-                    L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup("Non-Potential Address");
+                    L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup(`Non-Potential Address - ${lat}, ${long} - Price [${averagePrice}] \``);
                     // L.circle([lat, long], 40, {
                     //     color: '#939360',
                     //     fillColor: '#939360',
@@ -87,16 +88,19 @@ async function displayListings(L, mymap){
         const lat = data[elem].lat;
         const long = data[elem].long;
         const decision = data[elem].decision;
+        let value = "Is-Valid";
+        const averagePrice = data[elem].average_price;
         const options = {
             color: '#426c51',
             fillColor: '#426c51',
             fillOpacity: 0.5
         };
         if(decision==0){
+            value = "Invalid"
             options.color="#ab9dab"
             options.fillColor="#ab9dab"
         }
-        L.circle([lat, long], 10, options).addTo(mymap)
+        L.circle([lat, long], 10, options).addTo(mymap).bindPopup(`${lat}-${long}, Price - ${averagePrice}, Decision - ${value}`)
     }
 }
 

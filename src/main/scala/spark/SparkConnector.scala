@@ -26,14 +26,14 @@ object SparkConnector {
 
    val (sc,ssc,sqlContext) = createSparkConfiguration();
     val rdd = sc.makeRDD(listings.flatMap(_.toOption))
+    val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
+    WebServer.initialize(listings, popularAreas, actor);
    val model = TrainModel.trainModel(rdd, sqlContext)
    model.write.overwrite().save("trained-model")
 //     val model = LogisticRegressionModel.load("trained-model")
 
     val kafkaStream = createKafkaStream(ssc)
 
-    val actor = system.actorOf(Props(classOf[HouseAddressActor]), "sender")
-    WebServer.initialize(listings, popularAreas, actor);
     handleStreamMessages(kafkaStream, sc, sqlContext, model, actor)
 
     ssc.start()

@@ -20,8 +20,8 @@ class BackendSpec extends WordSpec with Matchers with ScalatestRouteTest{
     "return Listings for GET requests to the root path" in {
       // tests:
       Get("/airbnb-service/listings") ~> route ~> check {
-        val expected = "[{\n  \"address\": \"Westmeadows\",\n  \"decision\": 0,\n  \"lat\": -37.67656153,\n  \"long\": 144.873996\n}, {\n  \"address\": \"Melbourne\",\n  \"decision\": 0,\n  \"lat\": -37.82275411,\n  \"long\": 144.9635545\n}]"
-//        println(responseAs[String])
+        val expected = "[{\n  \"address\": \"Westmeadows\",\n  \"average_price\": 65,\n  \"decision\": 0,\n  \"lat\": -37.67656153,\n  \"long\": 144.873996\n}, {\n  \"address\": \"Melbourne\",\n  \"average_price\": 94,\n  \"decision\": 0,\n  \"lat\": -37.82275411,\n  \"long\": 144.9635545\n}]"
+        println(responseAs[String])
         responseAs[String] shouldEqual expected
       }
     }
