@@ -25,10 +25,8 @@ object WebServer {
 
 
   def getAddressJson(addresses: Seq[HouseAddress]): String ={
-    println(s"Starting serialization of addresses")
     import AddressProtocol._
     val addressSerialize = addresses.toJson.prettyPrint
-    println(s"Completed address serialization")
     addressSerialize
   }
 
@@ -44,7 +42,7 @@ object WebServer {
     popularAreaSerialize
   }
 
-  def getRoutes(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef): Route = {
+  def getRoutes(listings: Seq[Try[Listing]], popularAreas: Seq[Try[PopularArea]], actor: ActorRef)(implicit system: ActorSystem): Route = {
     val cors = new CORSHandler {}
 
     val listingsSerialize = getListingJson(listings)
