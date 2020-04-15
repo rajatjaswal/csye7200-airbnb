@@ -13,23 +13,20 @@ object TrainModel {
   def trainModel(rdd: RDD[Listing], sqlContext: SparkSession): LogisticRegressionModel = {
     import sqlContext.implicits._
     val obsDF = sqlContext.createDataFrame(rdd)
-    val featureColumns = Array("latitude", "longitude")
-    val assembler = new VectorAssembler().setInputCols(featureColumns).setOutputCol("features")
-    val df2 = assembler.transform(obsDF)
 
-    val labelIndexer = new StringIndexer().setInputCol("isWithinPopular").setOutputCol("label")
-    val df3 = labelIndexer.fit(df2).transform(df2)
-    df3.show()
+    val featureColumns = Array("latitude", "longitude")
+    val indexLabelColumn = "isWithinPopular"
+
+    val df = createLabeledDataFrame(obsDF, featureColumns, indexLabelColumn)
 
     val splitSeed = 3093
-    val Array(trainingData, testData) = df3.randomSplit(Array(0.8, 0.2), splitSeed)
+    val Array(trainingData, testData) = df.randomSplit(Array(0.8, 0.2), splitSeed)
     val lr = new LogisticRegression().setMaxIter(300).setRegParam(0.01).setElasticNetParam(0.92)
     val model = lr.fit(trainingData)
     val predictions = model.transform(testData)
     predictions.show(30)
 
-    val evaluator = new BinaryClassificationEvaluator().setLabelCol("label").setRawPredictionCol("rawPrediction").setMetricName("areaUnderROC")
-    val accuracy = evaluator.evaluate(predictions)
+    val accuracy = getModelAccuracy(predictions)
     println(s"Accuracy = $accuracy")
 
     val lp = predictions.select(s"label", s"prediction")
@@ -52,6 +49,21 @@ object TrainModel {
     println(s"Ration of correct results: $ratioCorrect")
 
     model
+  }
+
+  def getModelAccuracy(predictedDataframe: DataFrame): Double = {
+    val evaluator = new BinaryClassificationEvaluator().setLabelCol("label").setRawPredictionCol("rawPrediction").setMetricName("areaUnderROC")
+    evaluator.evaluate(predictedDataframe)
+  }
+
+  def createLabeledDataFrame(obsDF: DataFrame, featureColumns: Array[String], labelColumn: String): DataFrame = {
+    val assembler = new VectorAssembler().setInputCols(featureColumns).setOutputCol("features")
+    val df2 = assembler.transform(obsDF)
+
+    val labelIndexer = new StringIndexer().setInputCol(labelColumn).setOutputCol("label")
+    val df3 = labelIndexer.fit(df2).transform(df2)
+    df3.show()
+    df3
   }
 
   def getDecisionFromModel(df: DataFrame, model: LogisticRegressionModel, sqlContext: SparkSession, sc: SparkContext): RDD[HouseAddress] = {
