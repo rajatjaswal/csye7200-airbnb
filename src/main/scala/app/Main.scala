@@ -13,18 +13,14 @@ import akka.actor.ActorSystem
 import backend.WebServer
 
 object Main extends App{
-  implicit object IngestibleHouseAddress extends IngestibleHouseAddress
   implicit object IngestibleListing extends IngestibleListing
   implicit object IngestiblePopularArea extends IngestiblePopularArea
-  val address_ingester = new Ingest[HouseAddress]()
   val listing_ingester = new Ingest[Listing]()
   val popularArea_ingestor = new Ingest[PopularArea]()
   if (args.length > 1) {
     implicit val codec = Codec.UTF8
-    val address_source = Source.fromResource(args(0))
-    val listing_source = Source.fromResource(args(1))
-    val popularArea_source = Source.fromResource(args(2))
-    val addresses:Seq[Try[HouseAddress]] = address_ingester(address_source).toSeq
+    val listing_source = Source.fromResource(args(0))
+    val popularArea_source = Source.fromResource(args(1))
     val listings:Seq[Try[Listing]] = listing_ingester(listing_source).toSeq
     val popularAreas:Seq[Try[PopularArea]] = popularArea_ingestor(popularArea_source).toSeq
     val listingsInjected:Seq[Try[Listing]] = injectIsWithinPopular(popularAreas, listings)
@@ -37,6 +33,5 @@ object Main extends App{
 
     implicit val system = ActorSystem("my-system")
     SparkConnector.createNewSparkServer(listingsInjected, popularAreas)
-    address_source.close()
   }
 }

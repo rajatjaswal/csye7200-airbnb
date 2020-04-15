@@ -15,16 +15,14 @@ class HouseAddressActor extends Actor {
   def receive = {
     case newAddress :Seq[HouseAddress] => {
       addresses = newAddress
+      sender() ! newAddress
     }
     case GetAddreses => {
       sender() ! WebServer.getAddressJson(addresses)
     }
-    case x:Int => {
-      len += x
-    }
 
     case _ => {
-      "Invalid"
+      sender() ! "Invalid"
     }
   }
 }
