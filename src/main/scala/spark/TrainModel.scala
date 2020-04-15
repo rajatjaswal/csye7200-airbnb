@@ -14,7 +14,7 @@ object TrainModel {
     import sqlContext.implicits._
     val obsDF = sqlContext.createDataFrame(rdd)
 
-    val featureColumns = Array("latitude", "longitude")
+    val featureColumns = Array("latitude", "longitude","price","bedrooms")
     val indexLabelColumn = "isWithinPopular"
 
     val df = createLabeledDataFrame(obsDF, featureColumns, indexLabelColumn)
