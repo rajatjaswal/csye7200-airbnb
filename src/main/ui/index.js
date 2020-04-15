@@ -48,29 +48,56 @@ const icons = {
     green : L.icon({
         iconUrl: '../resources/house-yes.png',
         iconSize: [20, 20], // size of the icon
-    })
+    }),
+    falsepositive: L.icon({
+        iconUrl: '../resources/house-false-positive.png',
+        iconSize: [20, 20], // size of the icon
+    }),
+    falsenegative: L.icon({
+        iconUrl: '../resources/house-false-negative.png',
+        iconSize: [20, 20], // size of the icon
+    }),
 }
+
+
+let falsePositive = 0;
+let falseNegative = 0;
+let truePositive = 0;
+let trueNegative = 0;
+let percentage = 0;
 
 async function displayAddresses(L, mymap){
         const data = await getData("addresses");
 
         console.log(data);
-        let watch = 0;
+
         if (data.length > 0) {
             data.map(address => {
                 const lat = address.lat;
                 const long = address.long;
                 const averagePrice = address.average_price;
+                const isWithinPopularArea = address.isWithinPopularArea;
                 if (address.decision) {
-                    if(averagePrice > 100) watch++;
-                    L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] `).openPopup();;
-                    // L.circle([lat, long], 40, {
+                    if(((isWithinPopularArea === 1) && (averagePrice < 30 || averagePrice > 100)) || ((isWithinPopularArea === 0) && (averagePrice > 30 ))) {
+                        falsePositive++;
+                        L.marker([lat, long], {icon: icons.falsepositive}).addTo(mymap).bindPopup(`Potential Address but should be Non-Potential- ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`).openPopup();
+                    }else{
+                        truePositive++;
+                        L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`).openPopup();
+                    }
+                     // L.circle([lat, long], 40, {
                     //     color: '#52e00b',
                     //     fillColor: '#52e00b',
                     //     fillOpacity: 1
                     // }).addTo(mymap).bindPopup("Potential Address")
                 } else {
-                    L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup(`Non-Potential Address - ${lat}, ${long} - Price [${averagePrice}] \``);
+                    if(((isWithinPopularArea === 1) && (averagePrice >30 && averagePrice < 100)) || ((isWithinPopularArea === 0) && (averagePrice < 30 ))) {
+                        falseNegative++;
+                        L.marker([lat, long], {icon: icons.falsenegative}).addTo(mymap).bindPopup(`Non-Potential Address but should be Potential- ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`).openPopup();
+                    }else{
+                        trueNegative++;
+                        L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup(`Non-Potential Address - ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`);
+                    }
                     // L.circle([lat, long], 40, {
                     //     color: '#939360',
                     //     fillColor: '#939360',
@@ -79,7 +106,10 @@ async function displayAddresses(L, mymap){
                 }
                 // L.circle([lat, long], 200, options).addTo(mymap)
             })
-            console.log(watch);
+
+            percentage = (truePositive+trueNegative)/(truePositive+trueNegative+falseNegative+falsePositive) *100
+
+            alert(percentage);
         }
     // }
 }

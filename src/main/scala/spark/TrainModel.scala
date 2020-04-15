@@ -77,12 +77,12 @@ object TrainModel {
     df3.printSchema();
     val address = df3.map(row =>
       HouseAddress(Decision.parse(
-        if(row.getDouble(12)==0.0) {
+        if(row.getDouble(13)==0.0) {
           "T"
         } else {
           "F"
         }
-      ).get, row.getDouble(1), row.getDouble(2), row.getLong(3), row.getLong(4), row.getString(5), row.getInt(6), row.getBoolean(7), row.getBoolean(8))
+      ).get, row.getDouble(1), row.getDouble(2), row.getLong(3), row.getLong(4), row.getString(5), row.getInt(6), row.getBoolean(7), row.getBoolean(8), row.getInt(9))
     )
     sc.makeRDD(address.collect())
   }
