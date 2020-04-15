@@ -51,11 +51,11 @@ const icons = {
     }),
     falsepositive: L.icon({
         iconUrl: '../resources/house-false-positive.png',
-        iconSize: [20, 20], // size of the icon
+        iconSize: [15, 15], // size of the icon
     }),
     falsenegative: L.icon({
         iconUrl: '../resources/house-false-negative.png',
-        iconSize: [20, 20], // size of the icon
+        iconSize: [15, 15], // size of the icon
     }),
 }
 
@@ -109,7 +109,7 @@ async function displayAddresses(L, mymap){
 
             percentage = (truePositive+trueNegative)/(truePositive+trueNegative+falseNegative+falsePositive) *100
 
-            alert(percentage);
+            // alert(percentage);
         }
     // }
 }
@@ -124,8 +124,8 @@ async function displayListings(L, mymap){
         let value = "Is-Valid";
         const averagePrice = data[elem].average_price;
         const options = {
-            color: '#426c51',
-            fillColor: '#426c51',
+            color: '#966a6a',
+            fillColor: '#966a6a',
             fillOpacity: 0.5
         };
         if(decision==0){
@@ -133,7 +133,7 @@ async function displayListings(L, mymap){
             options.color="#ab9dab"
             options.fillColor="#ab9dab"
         }
-        L.circle([lat, long], 10, options).addTo(mymap).bindPopup(`${lat}-${long}, Price - ${averagePrice}, Decision - ${value}`)
+        L.circle([lat, long], 5, options).addTo(mymap).bindPopup(`${lat}-${long}, Price - ${averagePrice}, Decision - ${value}`)
     }
 }
 
