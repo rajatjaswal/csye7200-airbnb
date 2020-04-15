@@ -80,10 +80,15 @@ async function displayAddresses(L, mymap){
                 if (address.decision) {
                     if(((isWithinPopularArea === 1) && (averagePrice < 30 || averagePrice > 100)) || ((isWithinPopularArea === 0) && (averagePrice > 30 ))) {
                         falsePositive++;
-                        L.marker([lat, long], {icon: icons.falsepositive}).addTo(mymap).bindPopup(`Potential Address but should be Non-Potential- ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`).openPopup();
+                        setTimeout(function() {
+                            L.marker([lat, long], {icon: icons.falsepositive}).addTo(mymap).bindPopup(`Potential Address but should be Non-Potential- ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`);
+                        }, Math.random()*2000)
                     }else{
                         truePositive++;
-                        L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`).openPopup();
+                        setTimeout(function () {
+                            L.marker([lat, long], {icon: icons.green}).addTo(mymap).bindPopup(`Potential Address - ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`);
+                        }, Math.random()*2000)
+
                     }
                      // L.circle([lat, long], 40, {
                     //     color: '#52e00b',
@@ -93,10 +98,16 @@ async function displayAddresses(L, mymap){
                 } else {
                     if(((isWithinPopularArea === 1) && (averagePrice >30 && averagePrice < 100)) || ((isWithinPopularArea === 0) && (averagePrice < 30 ))) {
                         falseNegative++;
-                        L.marker([lat, long], {icon: icons.falsenegative}).addTo(mymap).bindPopup(`Non-Potential Address but should be Potential- ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`).openPopup();
+                        setTimeout(function() {
+                            L.marker([lat, long], {icon: icons.falsenegative}).addTo(mymap).bindPopup(`Non-Potential Address but should be Potential- ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`);
+                        }, Math.random()*2000)
+
                     }else{
                         trueNegative++;
-                        L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup(`Non-Potential Address - ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`);
+                        setTimeout(function(){
+                            L.marker([lat, long], {icon: icons.grey}).addTo(mymap).bindPopup(`Non-Potential Address - ${lat}, ${long} - Price [${averagePrice}] - IsWithin[${isWithinPopularArea}]`);
+                        }, Math.random()*2000)
+
                     }
                     // L.circle([lat, long], 40, {
                     //     color: '#939360',
@@ -133,7 +144,9 @@ async function displayListings(L, mymap){
             options.color="#ab9dab"
             options.fillColor="#ab9dab"
         }
-        L.circle([lat, long], 5, options).addTo(mymap).bindPopup(`${lat}-${long}, Price - ${averagePrice}, Decision - ${value}`)
+        setTimeout(function() {
+            L.circle([lat, long], 5, options).addTo(mymap).bindPopup(`${lat}-${long}, Price - ${averagePrice}, Decision - ${value}`)
+        }, Math.random()*2000)
     }
 }
 
