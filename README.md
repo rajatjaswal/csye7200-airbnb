@@ -41,10 +41,12 @@ Here is a screenshot of the result:
 ![Result Map](assets/Map.jpeg)
 
 Here is the zoomed in view of the results:
+
 ![Zoomed Map](assets/ExpandedView.jpeg)
 
 Following is the screenshot of the map with metrics:
 ![Result with metrics Map](assets/Metrics.png)
 
 Following is the Demo for the Entire Application:
+
 ![Demo](assets/GIF.gif)
