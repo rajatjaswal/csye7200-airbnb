@@ -38,3 +38,6 @@ Switch back to UI and you should be able to view the houseAddresses and some met
 
 Here is a screenshot of the result:
 ![Result Map](Map.jpeg)
+
+Following is the screenshot of the map with metrics:
+![Result with metrics Map](Metrics.png)
