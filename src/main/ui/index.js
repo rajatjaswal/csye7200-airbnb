@@ -30,8 +30,6 @@ function loadMap(){
 
     mymap.on('click', onMapClick);
 
-
-
     displayListings(L, mymap);
     displayPopularArea(L, mymap);
 
@@ -39,6 +37,33 @@ function loadMap(){
         displayAddresses(L, mymap);
     }, 10000);
 }
+let t1 = document.getElementById("gauge1");
+let t2 = document.getElementById("gauge2");
+let t3 = document.getElementById("gauge3");
+let t4 = document.getElementById("gauge4");
+
+let g1 = new Donut(t1);
+let g2 = new Donut(t2);
+let g3 = new Donut(t3);
+let g4 = new Donut(t4);
+
+let opts = {
+    angle: 0.35, // The span of the gauge arc
+    lineWidth: 0.1, // The line thickness
+    radiusScale: 1, // Relative radius
+    pointer: {
+        length: 0.6, // // Relative to gauge radius
+        strokeWidth: 0.035, // The thickness
+        color: '#000000' // Fill color
+    },
+    limitMax: false,     // If false, max value increases automatically if value > maxValue
+    limitMin: false,     // If true, the min value of the gauge will be fixed
+    colorStart: '#17b632',   // Colors
+    colorStop: '#0d7210',    // just experiment with them
+    strokeColor: '#eeeeee',  // to see which ones work best for you
+    generateGradient: true,
+    highDpiSupport: true,
+};
 
 const icons = {
     grey : L.icon({
@@ -65,7 +90,7 @@ let falseNegative = 0;
 let truePositive = 0;
 let trueNegative = 0;
 let percentage = 0;
-
+let total = 0;
 async function displayAddresses(L, mymap){
         const data = await getData("addresses");
 
@@ -117,9 +142,24 @@ async function displayAddresses(L, mymap){
                 }
                 // L.circle([lat, long], 200, options).addTo(mymap)
             })
-
-            percentage = (truePositive+trueNegative)/(truePositive+trueNegative+falseNegative+falsePositive) *100
-
+            total = truePositive+trueNegative+falseNegative+falsePositive;
+            percentage = (truePositive+trueNegative)/(total) *100
+            g1.setOptions(opts).animationSpeed = 32;
+            g1.setTextField(document.getElementById("preview-textfield-g1"));
+            g1.maxValue = total;
+            g1.set(truePositive);
+            g2.setOptions(opts).animationSpeed = 32;
+            g2.setTextField(document.getElementById("preview-textfield-g2"));
+            g2.maxValue = total;
+            g2.set(trueNegative);
+            g3.setOptions(opts).animationSpeed = 32;
+            g3.setTextField(document.getElementById("preview-textfield-g3"));
+            g3.maxValue = total;
+            g3.set(falsePositive);
+            g4.setOptions(opts).animationSpeed = 32;
+            g4.setTextField(document.getElementById("preview-textfield-g4"));
+            g4.maxValue = total;
+            g4.set(falseNegative);
             // alert(percentage);
         }
     // }
@@ -144,9 +184,9 @@ async function displayListings(L, mymap){
             options.color="#ab9dab"
             options.fillColor="#ab9dab"
         }
-        setTimeout(function() {
+        // setTimeout(function() {
             L.circle([lat, long], 5, options).addTo(mymap).bindPopup(`${lat}-${long}, Price - ${averagePrice}, Decision - ${value}`)
-        }, Math.random()*2000)
+        // }, Math.random()*2000)
     }
 }
 
