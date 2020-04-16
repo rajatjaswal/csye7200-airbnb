@@ -18,7 +18,9 @@ This decision is appended to the house address and is sent to an Akka Actor who 
 
 ## Let's Start
 To run the project you need to have kafka zookeeper installed in the system.
-
+Follow the steps in the link to get started with kafka:
+    https://kafka.apache.org/quickstart
+    
 ### Run Kafka, Zookeper and Producer
 Navigate to the kafka directory and execute the following commands each in different terminal:
 1. bin/zookeeper-server-start.sh config/zookeeper.properties
@@ -38,10 +40,17 @@ Now select any number of rows from resources/melbourne_housing.csv and paste the
 Switch back to UI and you should be able to view the houseAddresses and some metrics which are self-explanatory.
 
 Here is a screenshot of the result:
+
 ![Result Map](assets/Map.jpeg)
 
 Here is the zoomed in view of the results:
+
 ![Zoomed Map](assets/ExpandedView.jpeg)
 
 Following is the screenshot of the map with metrics:
+
 ![Result with metrics Map](assets/Metrics.png)
+
+Following is the Demo for the Entire Application:
+
+![Demo](assets/GIF.gif)
