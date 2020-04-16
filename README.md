@@ -3,9 +3,9 @@
 ## Introduction
 
 Airbnb is well-known for world-class B&B accommdations all over the globe. In this project we try to predict the possible accommodations in an area that could potentially be a part of Airbnb thus increasing the profits. We do so by using the ML capablities of Spark and open-source data available on Kaggle. Our model is trained on features like:
-    * Coordinates of the address. (Latitude, Longitude)
-    * Number of rooms in the property.
-    * Property price evaluation.
+1. Coordinates of the address. (Latitude, Longitude)
+2. Number of rooms in the property.
+3. Property price evaluation.
 We choose Melbourne, AUS as the city to perform prediction for our project.
 
 ## Architecture
@@ -31,6 +31,7 @@ Open up the project in any IDE which has good support for scala. We prefer Intel
     `melbourne_airbnb_one.csv popular_places.csv`
 
 Run the configuration and access UI at http://localhost:63342/airbnb/src/main/ui/index.html
+
 You should be able to see Markers denoting popular places in Melbourne and other dots indicating airbnb listings already present in the area. You could also see the grey markers denoting properties that our model thinks do not contribute much.
 
 Now select any number of rows from resources/melbourne_housing.csv and paste them in the producer terminal that we started in the first step.
