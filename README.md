@@ -18,7 +18,9 @@ This decision is appended to the house address and is sent to an Akka Actor who 
 
 ## Let's Start
 To run the project you need to have kafka zookeeper installed in the system.
-
+Follow the steps in the link to get started with kafka:
+    https://kafka.apache.org/quickstart
+    
 ### Run Kafka, Zookeper and Producer
 Navigate to the kafka directory and execute the following commands each in different terminal:
 1. bin/zookeeper-server-start.sh config/zookeeper.properties
