@@ -45,3 +45,6 @@ Here is the zoomed in view of the results:
 
 Following is the screenshot of the map with metrics:
 ![Result with metrics Map](assets/Metrics.png)
+
+Following is the Demo for the Entire Application
+![Demo](assets/GIF.gif)
