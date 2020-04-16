@@ -10,7 +10,7 @@ We choose Melbourne, AUS as the city to perform prediction for our project.
 
 ## Architecture
 Following is the architecture:
-![Architecture](architecture.png)
+![Architecture](assets/architecture.png)
 
 Spark is responsible for training a Logistic Regression model on Airbnb dataset. Kafka creates a consumer-producer context in the application and allows us to convert a static csv to a streaming data pipeline for our project. 
 Spark trained model is then applied on the streamed housing data to predict whether the incoming house-address is suitable for acquisiton or not.
@@ -37,7 +37,7 @@ Now select any number of rows from resources/melbourne_housing.csv and paste the
 Switch back to UI and you should be able to view the houseAddresses and some metrics which are self-explanatory.
 
 Here is a screenshot of the result:
-![Result Map](Map.jpeg)
+![Result Map](assets/Map.jpeg)
 
 Following is the screenshot of the map with metrics:
-![Result with metrics Map](Metrics.png)
+![Result with metrics Map](assets/Metrics.png)
