@@ -11,9 +11,16 @@
             crossorigin=""></script>
     <script src="gauge.min.js"></script>
     <style>
-        #mapid { height: 968px; width:80% }
-        #metrics { height: 968px; width: 20%; align-content: center; justify-content: center}
-        .gauge { padding: 5px; margin: 5px; align-content: center; justify-content: center}
+        #mapid { height: 700px; width:70% }
+        #metrics { height: 700px; width: 30%; align-content: center; justify-content: center}
+        .wrapper {width: 50%; float: left}
+        .wrapper p {margin:0 ; text-align: center; font-size: 22px;}
+        .gauge { width: 100% !important; height: 50% !important; padding: 5px; margin: 5px; align-content: center; justify-content: center}
+        .legend { padding: 10px; margin: 5px; align-content: center; justify-content: center; margin-bottom: 20px}
+        .legend h2 {margin: 0; text-align: center; margin-bottom: 10px}
+        .legend thead { font-size: 20px}
+        .legend table { margin: 0 auto}
+        .legend tbody tr td:first-child {width: 70px;}
         #main {display: flex}
     </style>
 </head>
@@ -22,7 +29,7 @@
         <div id="mapid"></div>
         <div id="metrics">
             <div class="legend">
-                <h4>Legend</h4>
+                <h2>Legend</h2>
                 <table>
                     <thead>
                         <td>Icon</td>
@@ -48,25 +55,25 @@
                     </tbody>
                 </table>
             </div>
-            <div style="justify-content: center">
+            <div class ="wrapper" style="justify-content: center">
                 <div style="font-size: 28px; justify-content: center; padding-left: 15px;">
                     <p>True Positive: <span id="preview-textfield-g1"></span></p>
                 </div>
                 <canvas class="gauge" id="gauge1"></canvas>
             </div>
-            <div style="justify-content: center">
+            <div class ="wrapper"  style="justify-content: center">
                 <div style="font-size: 28px; justify-content: center; padding-left: 15px;">
                     <p>True Negative: <span id="preview-textfield-g2"></span></p>
                 </div>
                 <canvas class="gauge" id="gauge2"></canvas>
             </div>
-            <div style="justify-content: center">
+            <div class ="wrapper" style="justify-content: center">
                 <div style="font-size: 28px; justify-content: center; padding-left: 15px;">
                     <p>False Positive: <span id="preview-textfield-g3"></span></p>
                 </div>
                 <canvas class="gauge" id="gauge3"></canvas>
             </div>
-            <div style="justify-content: center">
+            <div class ="wrapper" style="justify-content: center">
                 <div style="font-size: 28px; justify-content: center; padding-left: 15px;">
                     <p>False Negative: <span id="preview-textfield-g4"></span></p>
                 </div>
